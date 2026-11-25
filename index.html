@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio Manajemen Siaran 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0F7;--surface:#FFFFFF;--surface2:#F5F7FC;--ink:#111527;--muted:#586080;--line:#DDE2EF;
+  --accent:#3451D1;--on-accent:#FFFFFF;--accent-soft:#E6EBFD;--accent-deep:#22389F;
+  --red:#DE2E40;--red-deep:#A61C2B;--amber:#E89B00;--green:#18925A;--green-soft:#E1F4EA;--bad:#C0262F;--bad-soft:#FCE7E8;--teal:#0B8795;
+  --shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(20,28,70,.06),0 12px 30px -14px rgba(20,28,70,.28);
+  --font:"Plus Jakarta Sans",ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1020;--surface:#151A2F;--surface2:#1B2139;--ink:#EEF1FA;--muted:#9CA5C7;--line:#283055;
+  --accent:#8097FF;--on-accent:#0C1020;--accent-soft:#222B54;--accent-deep:#5D74E6;
+  --red:#FF5A69;--red-deep:#C93443;--amber:#FFBE3B;--green:#4FD18F;--green-soft:#163A2B;--bad:#FF7D84;--bad-soft:#44202A;--teal:#4FC7D3;
+  --shadow:0 1px 0 rgba(255,255,255,.05) inset,0 1px 2px rgba(0,0,0,.4),0 16px 34px -16px rgba(0,0,0,.7);
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0C1020;--surface:#151A2F;--surface2:#1B2139;--ink:#EEF1FA;--muted:#9CA5C7;--line:#283055;
+  --accent:#8097FF;--on-accent:#0C1020;--accent-soft:#222B54;--accent-deep:#5D74E6;
+  --red:#FF5A69;--red-deep:#C93443;--amber:#FFBE3B;--green:#4FD18F;--green-soft:#163A2B;--bad:#FF7D84;--bad-soft:#44202A;--teal:#4FC7D3;
+  --shadow:0 1px 0 rgba(255,255,255,.05) inset,0 1px 2px rgba(0,0,0,.4),0 16px 34px -16px rgba(0,0,0,.7);
+  color-scheme:dark;}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 24px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
+h1,h2,h3,h4{line-height:1.2;margin:0 0 .45em;letter-spacing:-.02em}
+h1{font-size:clamp(2rem,4.6vw,3.3rem);font-weight:800}
+h2{font-size:clamp(1.45rem,2.6vw,1.95rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:700}
+h4{font-size:1rem;font-weight:700}
+p{margin:0 0 .85em}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button,input,textarea,select{font:inherit;color:inherit}
+.muted{color:var(--muted)}.small{font-size:.9rem}
+.prose{max-width:70ch}
+
+/* ---------- app shell ---------- */
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px;padding:22px 16px;background:var(--surface);border-right:1px solid var(--line);overflow:auto;z-index:30}
+.brand{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink)}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#2D3B7E,#121736);display:grid;place-items:center;box-shadow:0 6px 14px -6px rgba(18,23,54,.8),inset 0 1px 0 rgba(255,255,255,.18);flex:none}
+.logo i{width:12px;height:12px;border-radius:50%;background:#4a5070;box-shadow:inset 0 -2px 3px rgba(0,0,0,.4);transition:all .3s}
+.logo.live i{background:#FF3B4E;box-shadow:0 0 12px #FF3B4E,inset 0 -2px 3px rgba(0,0,0,.3)}
+.brand b{display:block;font-weight:800;line-height:1.15}
+.brand small{color:var(--muted);font-size:.78rem}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--muted);font-weight:700;padding:10px 12px;border-radius:12px;font-size:.96rem}
+.nav a svg{width:20px;height:20px;flex:none}
+.nav a:hover{background:var(--surface2);color:var(--ink)}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 14px -8px var(--accent)}
+.nav a.guru-only{color:var(--teal)}
+.nav a.guru-only[aria-current="page"]{background:var(--teal);color:var(--on-accent)}
+.side .grow{flex:1}
+.modebox{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:10px}
+.modebox .lbl{font-size:.8rem;color:var(--muted);margin:0 0 6px 4px}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.mode button{border:0;background:transparent;padding:8px;border-radius:10px;cursor:pointer;font-weight:700;color:var(--muted)}
+.mode button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+body:not(.is-guru) .guru-only{display:none!important}
+main{padding:28px clamp(16px,3vw,40px) 70px;min-width:0}
+.inner{max-width:1120px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+.pagehead{margin-bottom:22px}
+.pagehead p{max-width:70ch}
+
+/* ---------- surfaces ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:var(--shadow)}
+.panel.flat{box-shadow:none;background:var(--surface2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mt{margin-top:22px}.mt2{margin-top:36px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--accent);color:var(--on-accent);font-weight:800;padding:12px 20px;border-radius:12px;cursor:pointer;text-decoration:none;box-shadow:0 4px 0 var(--accent-deep),0 10px 18px -10px var(--accent);transition:transform .08s,box-shadow .08s;position:relative;top:0}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-deep)}
+.btn.red{background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red-deep),0 10px 18px -10px var(--red)}
+.btn.red:active{box-shadow:0 1px 0 var(--red-deep)}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line) inset,0 3px 0 var(--line)}
+.btn.ghost:active{box-shadow:0 0 0 1px var(--line) inset,0 0 0 var(--line)}
+.btn.small{padding:8px 14px;font-size:.9rem;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btnrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--surface2);border:1px solid var(--line);padding:5px;border-radius:14px;margin-bottom:22px}
+.seg button{border:0;background:transparent;padding:9px 16px;border-radius:10px;font-weight:700;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.pra{background:#FFF1CC;color:#7A5300}.pill.pro{background:#FDE2E5;color:#A21B2B}.pill.pas{background:#D9F2F4;color:#0B6570}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pill.pra{background:#47380E;color:#FFD46A}:root:not([data-theme="light"]) .pill.pro{background:#4A1B25;color:#FFA4AF}:root:not([data-theme="light"]) .pill.pas{background:#113E44;color:#8CE3EA}}
+:root[data-theme="dark"] .pill.pra{background:#47380E;color:#FFD46A}:root[data-theme="dark"] .pill.pro{background:#4A1B25;color:#FFA4AF}:root[data-theme="dark"] .pill.pas{background:#113E44;color:#8CE3EA}
+.feedback{border-radius:12px;padding:12px 14px;margin-top:12px}
+.feedback.ok{background:var(--green-soft);color:var(--green)}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback ul{margin:.3em 0 0;padding-left:1.1em}
+.callout{border-radius:16px;padding:16px 20px;background:var(--accent-soft);color:var(--ink);margin-top:20px;border:1px solid var(--line)}
+.callout strong{color:var(--accent)}
+
+/* ---------- hero (always a dark studio) ---------- */
+.hero{position:relative;border-radius:26px;overflow:hidden;background:#070A14;min-height:clamp(440px,64vh,640px);color:#F2F4FF;box-shadow:0 30px 60px -30px rgba(7,10,20,.9)}
+.stagehost{position:absolute;inset:0}
+.hero .copy{position:relative;z-index:2;max-width:540px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;height:100%;min-height:inherit;justify-content:flex-end;background:linear-gradient(90deg,rgba(7,10,20,.92) 0%,rgba(7,10,20,.65) 60%,rgba(7,10,20,0) 100%);pointer-events:none}
+.hero .copy *{pointer-events:auto}
+.hero .kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:5px 12px;border-radius:999px;font-size:.85rem;font-weight:700;align-self:flex-start;margin-bottom:16px;backdrop-filter:blur(6px)}
+.hero .kicker i{width:8px;height:8px;border-radius:50%;background:#FF3B4E;box-shadow:0 0 10px #FF3B4E}
+.hero h1{color:#fff}
+.hero p{color:#C9CFEA;font-size:1.08rem;max-width:44ch}
+.hero .count{position:absolute;z-index:3;top:22px;right:22px;background:rgba(222,46,64,.92);border-radius:14px;padding:10px 16px;text-align:center;line-height:1;box-shadow:0 10px 26px -8px rgba(222,46,64,.8)}
+.hero .count b{display:block;font-size:2.2rem;font-weight:800}
+.hero .count span{font-size:.75rem;font-weight:700}
+.hint3d{position:absolute;z-index:3;right:22px;bottom:18px;font-size:.8rem;color:#AEB6DA;background:rgba(7,10,20,.6);padding:6px 10px;border-radius:8px;pointer-events:none}
+
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:0 0 16px 54px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(160deg,var(--accent),var(--accent-deep));color:var(--on-accent);font-weight:800;display:grid;place-items:center;box-shadow:0 3px 0 var(--accent-deep)}
+.steps li::after{content:"";position:absolute;left:18px;top:44px;bottom:2px;width:2px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps strong{display:block}
+.tile{display:block;text-decoration:none;color:var(--ink);transition:transform .2s}
+.tile:hover{transform:translateY(-3px)}
+.tile .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;margin-bottom:12px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 6px 12px -6px rgba(0,0,0,.4)}
+.tile .ic svg{width:24px;height:24px}
+.info{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:.95rem;margin:0}
+.info dt{color:var(--muted)}.info dd{margin:0;font-weight:700}
+
+/* ---------- studio 3D ---------- */
+.tour{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.stagebox{position:relative;border-radius:22px;overflow:hidden;background:#070A14;aspect-ratio:16/11;min-height:420px;box-shadow:0 26px 50px -28px rgba(7,10,20,.9)}
+.stage{position:absolute;inset:0}
+.stage canvas{display:block;width:100%!important;height:100%!important;touch-action:none;cursor:grab}
+.pins{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pin{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:auto;border:2px solid #fff;background:#3451D1;color:#fff;font-weight:800;font-size:.8rem;width:28px;height:28px;border-radius:50%;cursor:pointer;box-shadow:0 0 0 4px rgba(52,81,209,.35),0 6px 12px rgba(0,0,0,.5);display:grid;place-items:center;padding:0}
+.pin.on{background:#DE2E40;box-shadow:0 0 0 6px rgba(222,46,64,.4),0 6px 12px rgba(0,0,0,.5)}
+.pin[hidden]{display:none}
+.pins.off{display:none}
+.stagectl{position:absolute;left:14px;bottom:14px;display:flex;gap:8px;z-index:3}
+.stagectl button{border:1px solid rgba(255,255,255,.2);background:rgba(10,14,30,.7);color:#E8ECFF;padding:7px 12px;border-radius:10px;font-weight:700;font-size:.85rem;cursor:pointer;backdrop-filter:blur(6px)}
+.nogl{position:absolute;inset:0;display:none;place-items:center;text-align:center;color:#C9CFEA;padding:24px}
+.hslist{display:grid;gap:6px;max-height:320px;overflow:auto;padding-right:4px}
+.hsbtn{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:700;font-size:.92rem}
+.hsbtn .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:.78rem}
+.hsbtn[aria-pressed="true"]{border-color:var(--red);background:var(--surface)}
+.hsbtn[aria-pressed="true"] .n{background:var(--red);color:#fff}
+.hsdetail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:10px 0 0;font-size:.92rem}
+.hsdetail dt{color:var(--muted);font-weight:700}
+.hsdetail dd{margin:0}
+
+/* ---------- materi ---------- */
+.stagecards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;perspective:1000px}
+.scard{border:0;text-align:left;cursor:pointer;border-radius:20px;padding:22px;color:#fff;position:relative;overflow:hidden;transform:rotateX(0);transition:transform .25s,box-shadow .25s;box-shadow:0 14px 26px -14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25)}
+.scard:hover{transform:translateY(-4px) rotateX(4deg)}
+.scard[aria-pressed="true"]{outline:4px solid var(--amber);outline-offset:3px}
+.scard .big{font-size:2.6rem;font-weight:800;opacity:.25;position:absolute;right:16px;top:6px}
+.scard h3{color:#fff;margin-bottom:4px}
+.scard p{margin:0;font-size:.92rem;opacity:.9}
+.s-pra{background:linear-gradient(150deg,#F2A900,#B86E00)}.s-pro{background:linear-gradient(150deg,#E5394B,#9E1828)}.s-pas{background:linear-gradient(150deg,#14A3B2,#0A6670)}
+.acts{display:grid;gap:10px;margin-top:18px}
+.act{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
+.act .no{width:40px;height:40px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;color:var(--muted)}
+.act h4{margin:0 0 2px}
+.act p{margin:0;font-size:.93rem;color:var(--muted)}
+.act .meta{display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:.82rem;text-align:right;min-width:150px}
+.act .meta b{color:var(--ink)}
+.orgwrap{overflow-x:auto;padding:6px 2px 10px}
+.orgtree{min-width:760px}
+.lvl{display:flex;justify-content:center;gap:10px;position:relative;padding-top:22px}
+.lvl:first-child{padding-top:0}
+.lvl+.lvl::before{content:"";position:absolute;top:0;left:50%;width:2px;height:22px;background:var(--line)}
+.branch{display:flex;gap:14px;justify-content:center;align-items:flex-start;padding-top:22px;position:relative}
+.branch::before{content:"";position:absolute;top:0;left:14%;right:14%;height:2px;background:var(--line)}
+.col{display:flex;flex-direction:column;gap:8px;min-width:150px}
+.colname{font-size:.8rem;color:var(--muted);text-align:center;font-weight:700}
+.node{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font-weight:700;font-size:.9rem;cursor:pointer;text-align:center;box-shadow:0 3px 0 var(--line)}
+.node:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.node.top{background:linear-gradient(160deg,#2D3B7E,#151B44);color:#fff;border-color:#151B44;box-shadow:0 3px 0 #0b0f29}
+.node.lead{border-color:var(--teal);box-shadow:0 3px 0 var(--teal)}
+.node[aria-pressed="true"]{outline:3px solid var(--red);outline-offset:2px}
+.roleinfo{min-height:140px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-weight:700;background:var(--surface2);color:var(--muted);font-size:.85rem}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.sub td{background:var(--surface2);font-weight:800}
+.gantt{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(15,minmax(30px,1fr));font-size:.82rem;min-width:820px}
+.gantt div{padding:6px 4px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.gantt .hd{font-weight:800;color:var(--muted);justify-content:center;background:var(--surface2)}
+.gantt .lab{font-weight:700;padding-left:12px}
+.gantt .bar{padding:6px 0}
+.gantt .bar span{display:block;height:16px;width:100%;border-radius:0}
+.gantt .bar.s span{border-top-left-radius:8px;border-bottom-left-radius:8px}
+.gantt .bar.e span{border-top-right-radius:8px;border-bottom-right-radius:8px}
+.c-pra span{background:#E89B00}.c-pro span{background:#DE2E40}.c-pas span{background:#0B8795}.c-tay span{background:#3451D1}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.term{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.term b{display:block;margin-bottom:2px}
+.term span{font-size:.92rem;color:var(--muted)}
+.search{max-width:360px;margin-bottom:14px}
+
+/* ---------- misi ---------- */
+.case{display:grid;grid-template-columns:1.35fr 1fr;gap:22px}
+.problems{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.problem{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:14px;box-shadow:var(--shadow)}
+.problem .n{width:38px;height:38px;border-radius:12px;background:linear-gradient(160deg,#FF5466,#B71C2D);color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 3px 0 #7d1220}
+.problem .link{font-size:.84rem;color:var(--muted);margin-top:6px}
+.meterbar{height:16px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin:10px 0}
+.meterbar span{display:block;height:100%;background:linear-gradient(90deg,#FF7A55,#DE2E40)}
+.task .letter{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:1.4rem;color:#fff;margin-bottom:10px}
+.roles{display:flex;flex-wrap:wrap;gap:8px}
+.roles span{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:700;font-size:.9rem}
+
+/* ---------- simulasi ---------- */
+.scoreline{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:4px 0 16px}
+.score{background:var(--surface);border:1px solid var(--line);padding:6px 14px;border-radius:10px;font-weight:800}
+.match{display:grid;grid-template-columns:1fr 1.5fr;gap:14px}
+.matchcol{display:grid;gap:8px;align-content:start}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;text-align:left;cursor:pointer;font-size:.94rem;line-height:1.4;box-shadow:0 3px 0 var(--line)}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.chip.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 3px 0 var(--accent)}
+.chip.done{border-color:var(--green);background:var(--green-soft);box-shadow:none;cursor:default}
+.chip.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.deck{display:flex;flex-wrap:wrap;gap:8px}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.bin{border:2px dashed var(--line);border-radius:16px;padding:14px;min-height:170px;background:var(--surface);cursor:pointer;text-align:left}
+.bin:hover{border-color:var(--accent)}
+.bin .placed{font-size:.86rem;padding:6px 9px;border-radius:8px;background:var(--green-soft);margin-top:6px}
+.gridb{grid-template-columns:1.5fr 1fr}
+.bitem{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;cursor:pointer}
+.bitem input{width:20px;height:20px;accent-color:var(--accent)}
+.bitem .cost{font-weight:800;font-variant-numeric:tabular-nums}
+.bitems{display:grid;gap:8px}
+.meter{position:sticky;top:24px}
+.bignum{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+
+/* ---------- kuis ---------- */
+.quiz{max-width:760px}
+.qprog{display:flex;gap:6px;margin-bottom:16px}
+.qprog span{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.qprog span.on{background:var(--accent)}
+.opts{display:grid;gap:10px;margin:16px 0}
+.opt{border:1px solid var(--line);background:var(--surface2);border-radius:14px;padding:13px 16px;text-align:left;cursor:pointer;font-weight:500;box-shadow:0 3px 0 var(--line)}
+.opt.right{border-color:var(--green);background:var(--green-soft)}
+.opt.wrongpick{border-color:var(--bad);background:var(--bad-soft)}
+
+/* ---------- LKPD ---------- */
+.lkpdhead{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.progress{min-width:240px}
+.track{height:12px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#2FB07A,#18925A);transition:width .3s}
+.part{margin-top:20px}
+.part h3 .pn{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--red);color:#fff;font-size:.9rem;margin-right:8px;vertical-align:2px}
+label{display:block;font-weight:700;margin:12px 0 5px;font-size:.93rem}
+input[type=text],input[type=number],textarea,select{width:100%;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 12px}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{min-height:86px;resize:vertical}
+.rows{display:grid;gap:8px}
+.rowin{display:grid;grid-template-columns:1fr 2fr auto;gap:8px}
+.rowin.b{grid-template-columns:2fr 1fr auto}
+.x{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:42px;height:42px;cursor:pointer;color:var(--muted);font-size:1.1rem}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mood{display:flex;gap:8px;flex-wrap:wrap}
+.mood button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:9px 14px;cursor:pointer;font-weight:700}
+.mood button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.saved{font-size:.85rem;color:var(--green);font-weight:700}
+#exporttext{min-height:260px;font-size:.85rem}
+
+/* ---------- guru ---------- */
+.rundown{display:grid;grid-template-columns:310px 1fr;gap:18px}
+.phases{display:grid;gap:6px;align-content:start}
+.phase{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:700}
+.phase small{color:var(--muted);white-space:nowrap}
+.phase.cur{border-color:var(--red);box-shadow:inset 4px 0 0 var(--red)}
+.phase.past{opacity:.55}
+.clock{font-size:clamp(3.4rem,9vw,5.6rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.clock.over{color:var(--red)}
+.checklist{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px}
+.checklist label{display:flex;gap:10px;font-weight:500;margin:0}
+.checklist input{width:18px;height:18px;margin-top:4px;accent-color:var(--accent);flex:none}
+td select{min-width:66px}td input[type=text]{min-width:150px}
+.rubric td{min-width:130px;font-size:.88rem}
+
+@media (max-width:1100px){.tour{grid-template-columns:1fr}.hslist{max-height:none;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+@media (max-width:960px){
+  .app{display:block}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px;border-right:0;border-bottom:1px solid var(--line)}
+  .brand small{display:none}
+  .side .grow{display:none}
+  .modebox{padding:4px;margin-left:auto;border-radius:12px}.modebox .lbl{display:none}
+  .mode button{padding:6px 12px}
+  .nav{flex-direction:row;overflow-x:auto;width:100%;order:3;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none;padding:8px 12px}
+  .nav a svg{display:none}
+  .grid2,.case,.rundown,.match,.gridb{grid-template-columns:1fr}
+  .grid3,.stagecards,.bins{grid-template-columns:1fr}
+  .grid4,.timeline{grid-template-columns:1fr 1fr}
+  .meter{position:static}
+  .act{grid-template-columns:40px 1fr}.act .meta{grid-column:2;align-items:flex-start;text-align:left;flex-direction:row;flex-wrap:wrap}
+  .stagebox{aspect-ratio:auto;height:62vh;min-height:380px}
+}
+@media (max-width:560px){.hint3d{display:none}.hero{min-height:640px}.hero .count{top:14px;right:14px;padding:8px 12px}.hero .count b{font-size:1.6rem}.brand b{font-size:.95rem}.brand{flex:1;min-width:0}.grid4,.timeline{grid-template-columns:1fr}.rowin,.rowin.b{grid-template-columns:1fr auto}.rowin>:nth-child(2){grid-column:1}.hero .copy{background:linear-gradient(0deg,rgba(7,10,20,.95) 0%,rgba(7,10,20,.6) 65%,rgba(7,10,20,0) 100%)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <a class="brand" href="#beranda"><span class="logo" id="lamp" title="Menyala saat pengatur waktu guru berjalan"><i></i></span><span><b>Studio Manajemen Siaran</b><small>Broadcasting dan Perfilman XII</small></span></a>
+  <nav class="nav" aria-label="Menu utama">
+    <a href="#beranda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Beranda</a>
+    <a href="#studio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>Studio 3D</a>
+    <a href="#materi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7M8 11h7"/></svg>Materi</a>
+    <a href="#misi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Misi PBL</a>
+    <a href="#simulasi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15 12h.01M17.5 13.5h.01"/></svg>Simulasi</a>
+    <a href="#lkpd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2M9 12h6M9 16h4"/></svg>Lembar Kerja</a>
+    <a href="#kuis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>Kuis</a>
+    <a href="#guru" class="guru-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Panel Guru</a>
+  </nav>
+  <div class="grow"></div>
+  <div class="modebox">
+    <p class="lbl">Masuk sebagai</p>
+    <div class="mode" role="group" aria-label="Mode pengguna">
+      <button type="button" data-mode="murid" aria-pressed="true">Murid</button>
+      <button type="button" data-mode="guru" aria-pressed="false">Guru</button>
+    </div>
+  </div>
+</aside>
+
+<main><div class="inner">
+
+<!-- ================= BERANDA ================= -->
+<section class="view" id="v-beranda">
+  <div class="hero">
+    <div class="stagehost" id="hero3d"></div>
+    <div class="count"><b>14</b><span>hari menuju tayang</span></div>
+    <div class="copy">
+      <span class="kicker"><i></i>Misi Pertemuan 1</span>
+      <h1>“Ngobrol Makassar” nyaris batal tayang.</h1>
+      <p>Studio sudah siap, tetapi tim produksinya kacau. Tugas tumpang tindih, alat dipinjam, anggaran membengkak, naskah terlambat. Kalian tim konsultan yang diminta menyelamatkannya.</p>
+      <div class="btnrow">
+        <a class="btn red" href="#misi">Mulai misi</a>
+        <a class="btn ghost" href="#studio">Jelajahi studio 3D</a>
+      </div>
+    </div>
+    <div class="hint3d">Seret untuk memutar studio</div>
+  </div>
+
+  <div class="grid4 mt2">
+    <a class="panel tile" href="#studio"><div class="ic" style="background:linear-gradient(150deg,#5B73F0,#2A3DA8)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg></div><h3>Studio 3D</h3><p class="small muted">Kenali kamera, lampu, ruang kontrol, dan kru dalam bentuk nyata.</p></a>
+    <a class="panel tile" href="#materi"><div class="ic" style="background:linear-gradient(150deg,#F2A900,#B86E00)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5"/></svg></div><h3>Materi</h3><p class="small muted">Tahapan, organisasi, sumber daya, jadwal, dan istilah.</p></a>
+    <a class="panel tile" href="#simulasi"><div class="ic" style="background:linear-gradient(150deg,#E5394B,#9E1828)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3"/></svg></div><h3>Simulasi</h3><p class="small muted">Cocokkan jabatan, pilah kegiatan, atur sisa anggaran.</p></a>
+    <a class="panel tile" href="#lkpd"><div class="ic" style="background:linear-gradient(150deg,#14A3B2,#0A6670)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/></svg></div><h3>Lembar Kerja</h3><p class="small muted">Susun Rencana Kerja Produksi kelompok.</p></a>
+  </div>
+
+  <div class="grid2 mt2">
+    <div class="panel">
+      <h2>Setelah belajar, kalian mampu</h2>
+      <ol class="steps">
+        <li><strong>Menjelaskan tahapan produksi</strong><span class="muted">Praproduksi, produksi, dan pascaproduksi beserta kegiatan utamanya.</span></li>
+        <li><strong>Mengidentifikasi organisasi penyiaran</strong><span class="muted">Posisi dalam tim produksi beserta tugas dan tanggung jawabnya.</span></li>
+        <li><strong>Menganalisis sumber daya produksi</strong><span class="muted">SDM, peralatan, anggaran, dan waktu untuk satu program.</span></li>
+        <li><strong>Menyusun Rencana Kerja Produksi</strong><span class="muted">Lalu mempresentasikannya sebagai solusi atas kasus.</span></li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h2>Alur belajar (PBL)</h2>
+      <ol class="steps">
+        <li><strong>Orientasi pada masalah</strong><span class="muted small">10 menit. Baca kasus dan tandai informasi penting.</span></li>
+        <li><strong>Mengorganisasikan belajar</strong><span class="muted small">10 menit. Bentuk kelompok, bagi peran dan Tugas A, B, C.</span></li>
+        <li><strong>Penyelidikan kelompok</strong><span class="muted small">25 menit. Pelajari materi dan studio 3D, coba simulasi, isi lembar kerja.</span></li>
+        <li><strong>Menyajikan hasil karya</strong><span class="muted small">15 menit. Rapikan Rencana Kerja Produksi, presentasi 3 menit.</span></li>
+        <li><strong>Evaluasi pemecahan masalah</strong><span class="muted small">10 menit. Cek empat masalah, refleksi, dan kuis.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="panel mt">
+    <h3>Tentang pertemuan ini</h3>
+    <dl class="info">
+      <dt>Sekolah</dt><dd>SMK Negeri 2 Makassar</dd>
+      <dt>Pendidik</dt><dd>Akifa, S.Pd.</dd>
+      <dt>Elemen</dt><dd>Manajemen Produksi dan Siaran Televisi (Fase F)</dd>
+      <dt>Alokasi</dt><dd>2 JP (2 × 45 menit)</dd>
+      <dt>Model</dt><dd>Problem Based Learning, pendekatan deep learning</dd>
+      <dt>Produk akhir</dt><dd>Rencana Kerja Produksi kelompok, ketuntasan minimal 75</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- ================= STUDIO 3D ================= -->
+<section class="view" id="v-studio">
+  <div class="pagehead">
+    <h2>Studio 3D “Ngobrol Makassar”</h2>
+    <p class="muted">Ini studio talkshow TV Pesisir Makassar. Seret untuk memutar, cubit atau gulir untuk mendekat. Ketuk titik bernomor atau benda di studio untuk melihat fungsi, siapa yang bertanggung jawab, dan kaitannya dengan kasus.</p>
+  </div>
+  <div class="tour">
+    <div class="stagebox" id="tour3d">
+      <div class="stagectl"><button type="button" id="viewall">Lihat seluruh studio</button><button type="button" id="togglepins">Sembunyikan titik</button></div>
+    </div>
+    <div>
+      <div class="panel hsdetail" id="hsdetail" aria-live="polite">
+        <h3>Pilih bagian studio</h3>
+        <p class="muted small">Ada 11 titik: peralatan, kru, dan area. Mulailah dari kamera atau ruang kontrol.</p>
+      </div>
+      <div class="panel mt"><h4>Semua titik</h4><div class="hslist" id="hslist"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MATERI ================= -->
+<section class="view" id="v-materi">
+  <div class="pagehead">
+    <h2>Materi</h2>
+    <p class="muted"><strong>Produksi program televisi</strong> adalah rangkaian kegiatan terencana untuk mengubah sebuah ide menjadi tayangan audio visual yang siap disiarkan. <strong>Manajemen produksi</strong> mengatur kapan pekerjaan dilakukan (tahapan), siapa yang mengerjakan (organisasi), dan dengan apa pekerjaan dilakukan (sumber daya).</p>
+  </div>
+  <div class="seg" role="group" aria-label="Topik materi">
+    <button type="button" data-sub="tahapan" aria-pressed="true">Tahapan produksi</button>
+    <button type="button" data-sub="organisasi" aria-pressed="false">Organisasi penyiaran</button>
+    <button type="button" data-sub="sumberdaya" aria-pressed="false">Sumber daya</button>
+    <button type="button" data-sub="jadwal" aria-pressed="false">Jadwal 14 hari</button>
+    <button type="button" data-sub="istilah" aria-pressed="false">Istilah</button>
+  </div>
+
+  <div data-subview="tahapan">
+    <div class="stagecards" id="stagecards"></div>
+    <div id="stagebody"></div>
+    <div class="callout"><strong>Kaitan dengan kasus.</strong> Hampir semua masalah “Ngobrol Makassar” berasal dari praproduksi yang terburu-buru. Pembagian tugas, booking alat, anggaran, dan naskah seharusnya beres sebelum hari syuting. Kalau praproduksi rapi, produksi dan pascaproduksi berjalan lancar.</div>
+  </div>
+
+  <div data-subview="organisasi" hidden>
+    <p class="muted prose">Ada dua tingkat organisasi. <strong>Organisasi stasiun</strong> mengatur seluruh perusahaan televisi. <strong>Tim produksi</strong> mengerjakan satu program. Ketuk sebuah posisi untuk melihat tugasnya.</p>
+    <div class="grid2" style="grid-template-columns:1.6fr 1fr">
+      <div>
+        <div class="panel"><h3>Organisasi stasiun televisi</h3><div class="orgwrap"><div class="orgtree" id="org-station" style="min-width:640px"></div></div></div>
+        <div class="panel mt"><h3>Tim produksi program</h3><div class="orgwrap"><div class="orgtree" id="org-team"></div></div></div>
+      </div>
+      <div><div class="panel roleinfo" id="roleinfo" aria-live="polite" style="position:sticky;top:24px"><h3>Pilih posisi</h3><p class="muted small">Ketuk salah satu kotak di bagan untuk melihat tugas, tahap kerja, dan perannya dalam kasus.</p></div></div>
+    </div>
+    <div class="callout"><strong>Above the line dan below the line.</strong> Produser, sutradara, penulis naskah, dan talent disebut kru <em>above the line</em> karena menentukan isi kreatif. Kameramen, penata cahaya, penata suara, dan editor disebut <em>below the line</em> karena menjalankan sisi teknis. Keduanya sama penting.</div>
+  </div>
+
+  <div data-subview="sumberdaya" hidden>
+    <div class="grid2">
+      <div class="panel"><h3>SDM untuk talkshow 30 menit</h3><p class="small muted">Contoh kebutuhan kru dan talent.</p><div class="tablewrap"><table id="sdmtable"></table></div></div>
+      <div class="panel"><h3>Peralatan studio</h3><p class="small muted">Lihat bentuk nyatanya di <a href="#studio">Studio 3D</a>.</p><div class="tablewrap"><table id="alattable"></table></div></div>
+    </div>
+    <div class="panel mt">
+      <h3>Anggaran: contoh rencana (RAB) Rp12.000.000</h3>
+      <p class="small muted prose">Rencana anggaran biaya (RAB) membagi dana ke setiap tahap. Bandingkan dengan kasus: sebelum pascaproduksi, tim sudah memakai Rp9.500.000, padahal rencana praproduksi ditambah produksi hanya Rp8.500.000.</p>
+      <div class="tablewrap"><table id="rabtable"></table></div>
+    </div>
+    <div class="panel mt">
+      <h3>Waktu</h3>
+      <p class="prose">Jadwal kerja (<em>time schedule</em>) disusun <strong>mundur dari tanggal tayang</strong>. Setiap kegiatan diberi tenggat, siapa penanggung jawabnya, dan waktu cadangan. Lihat contohnya di tab <button type="button" class="btn small ghost" data-goto-sub="jadwal">Jadwal 14 hari</button></p>
+    </div>
+  </div>
+
+  <div data-subview="jadwal" hidden>
+    <div class="panel">
+      <h3>Contoh jadwal kerja 14 hari menuju tayang perdana</h3>
+      <p class="small muted">H-14 berarti 14 hari sebelum tayang. Warna menunjukkan tahap: <span class="pill pra">Praproduksi</span> <span class="pill pro">Produksi</span> <span class="pill pas">Pascaproduksi</span></p>
+      <div class="tablewrap"><div class="gantt" id="gantt"></div></div>
+      <div class="callout"><strong>Perhatikan.</strong> Naskah final ditargetkan H-8 dan latihan H-7, jauh sebelum syuting. Pada kasus, naskah baru selesai sehari sebelum syuting sehingga tidak ada waktu latihan.</div>
+    </div>
+  </div>
+
+  <div data-subview="istilah" hidden>
+    <input type="text" class="search" id="termsearch" placeholder="Cari istilah, misalnya rundown" aria-label="Cari istilah">
+    <div class="terms" id="terms"></div>
+  </div>
+</section>
+
+<!-- ================= MISI ================= -->
+<section class="view" id="v-misi">
+  <div class="case">
+    <div>
+      <h2>Misi: selamatkan “Ngobrol Makassar”</h2>
+      <p class="prose">TV Pesisir Makassar (stasiun lokal fiktif) akan menayangkan talkshow baru berdurasi 30 menit tentang kuliner, budaya, dan anak muda Bugis-Makassar. Tayang perdana tinggal <strong>14 hari lagi</strong>. Tim yang ditunjuk melaporkan empat masalah:</p>
+      <ol class="problems" id="problems"></ol>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Kondisi anggaran</h3>
+        <div class="meterbar" role="img" aria-label="79 persen anggaran sudah terpakai"><span style="width:79.2%"></span></div>
+        <dl class="info">
+          <dt>Disetujui</dt><dd>Rp12.000.000</dd>
+          <dt>Terpakai</dt><dd>Rp9.500.000 (79%)</dd>
+          <dt>Sisa</dt><dd style="color:var(--red)">Rp2.500.000</dd>
+        </dl>
+        <p class="small muted" style="margin:10px 0 0">Editing dan penayangan belum dimulai.</p>
+      </div>
+      <div class="panel mt">
+        <h3>Peran kalian</h3>
+        <p>Tim konsultan produksi. Tugasnya: menyusun <strong>Rencana Kerja Produksi</strong> yang menyelamatkan program ini.</p>
+        <h4>Pertanyaan pemandu</h4>
+        <ol style="padding-left:1.2em;margin:0">
+          <li>Kegiatan praproduksi apa yang terlewat?</li>
+          <li>Posisi apa yang dibutuhkan dan siapa bertanggung jawab atas apa?</li>
+          <li>Sumber daya apa yang harus dipetakan agar kejadian serupa tidak terulang?</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt2">
+    <h2>Pembagian kerja kelompok</h2>
+    <p class="muted prose">Kelompok 4–5 orang. Bagi peran, lalu bagi tiga tugas penyelidikan. Semua hasil digabung menjadi Rencana Kerja Produksi.</p>
+    <div class="roles"><span>Ketua</span><span>Pencatat</span><span>Pencari referensi</span><span>Penyaji</span></div>
+    <div class="grid3 mt">
+      <div class="panel task"><div class="letter" style="background:linear-gradient(150deg,#F2A900,#B86E00)">A</div><h3>Tahapan produksi</h3><p class="small">Susun tabel kegiatan praproduksi, produksi, dan pascaproduksi, minimal 4 kegiatan per tahap. Tandai kegiatan yang terlewat pada kasus.</p><a class="btn small ghost" href="#lkpd" data-jump="part2">Isi bagian 2</a></div>
+      <div class="panel task"><div class="letter" style="background:linear-gradient(150deg,#E5394B,#9E1828)">B</div><h3>Organisasi dan jabatan</h3><p class="small">Buat bagan organisasi minimal 8 posisi beserta tugasnya. Tetapkan penanggung jawab izin lokasi dan narasumber.</p><a class="btn small ghost" href="#lkpd" data-jump="part3">Isi bagian 3</a></div>
+      <div class="panel task"><div class="letter" style="background:linear-gradient(150deg,#14A3B2,#0A6670)">C</div><h3>Sumber daya dan anggaran</h3><p class="small">Petakan SDM, peralatan, anggaran, dan waktu. Hitung usulan pengeluaran dengan sisa Rp2.500.000.</p><a class="btn small ghost" href="#lkpd" data-jump="part4">Isi bagian 4</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SIMULASI ================= -->
+<section class="view" id="v-simulasi">
+  <div class="pagehead"><h2>Simulasi</h2><p class="muted">Tiga latihan singkat sebelum mengisi lembar kerja.</p></div>
+  <div class="seg" role="group" aria-label="Pilih simulasi">
+    <button type="button" data-sim="cocok" aria-pressed="true">Cocokkan jabatan dan tugas</button>
+    <button type="button" data-sim="urut" aria-pressed="false">Pilah kegiatan per tahap</button>
+    <button type="button" data-sim="anggaran" aria-pressed="false">Atur sisa anggaran</button>
+  </div>
+
+  <div data-simview="cocok">
+    <p>Ketuk satu jabatan di kiri, lalu ketuk tugas yang sesuai di kanan.</p>
+    <div class="scoreline"><span class="score" id="m-score">Cocok 0/8</span><span class="score" id="m-miss">Salah 0</span><button class="btn small ghost" type="button" id="m-reset">Acak ulang</button></div>
+    <div class="match"><div class="matchcol" id="m-left"></div><div class="matchcol" id="m-right"></div></div>
+    <div id="m-result" aria-live="polite"></div>
+  </div>
+
+  <div data-simview="urut" hidden>
+    <p>Ketuk kartu kegiatan, lalu ketuk tahap yang tepat.</p>
+    <div class="scoreline"><span class="score" id="s-score">Benar 0/14</span><span class="score" id="s-miss">Salah 0</span><button class="btn small ghost" type="button" id="s-reset">Mulai ulang</button></div>
+    <div class="deck" id="s-deck"></div>
+    <div class="bins" id="s-bins"></div>
+    <div id="s-result" aria-live="polite"></div>
+  </div>
+
+  <div data-simview="anggaran" hidden>
+    <p class="prose">Sisa dana tinggal <strong>Rp2.500.000</strong>. Pilih pengeluaran yang paling penting agar program tetap tayang, tanpa melebihi sisa dana.</p>
+    <div class="grid2 gridb">
+      <div class="bitems" id="b-items"></div>
+      <div><div class="panel meter">
+        <div class="muted small">Total usulan</div>
+        <div class="bignum" id="b-total">Rp0</div>
+        <div class="meterbar"><span id="b-bar" style="width:0;background:var(--teal)"></span></div>
+        <div class="muted small">Sisa setelah usulan</div>
+        <div class="bignum" id="b-left" style="font-size:1.5rem">Rp2.500.000</div>
+        <button class="btn" type="button" id="b-check" style="margin-top:14px">Periksa usulan</button>
+        <div id="b-feedback" aria-live="polite"></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LKPD ================= -->
+<section class="view" id="v-lkpd">
+  <div class="lkpdhead">
+    <div><h2>Lembar Kerja: Rencana Kerja Produksi</h2><p class="muted" style="margin:0">Isian tersimpan otomatis di perangkat ini. <span class="saved" id="savedmsg"></span></p></div>
+    <div class="progress"><div class="small muted" id="progtext">0% terisi</div><div class="track"><div class="fill" id="progfill"></div></div></div>
+  </div>
+
+  <div class="panel part">
+    <h3>Identitas kelompok</h3>
+    <div class="grid2">
+      <div><label for="f-kel">Nama kelompok</label><input type="text" id="f-kel" data-k="kelompok"></div>
+      <div><label for="f-kelas">Kelas</label><input type="text" id="f-kelas" data-k="kelas"></div>
+    </div>
+    <div class="grid4">
+      <div><label for="f-r1">Ketua</label><input type="text" id="f-r1" data-k="ketua"></div>
+      <div><label for="f-r2">Pencatat</label><input type="text" id="f-r2" data-k="pencatat"></div>
+      <div><label for="f-r3">Pencari referensi</label><input type="text" id="f-r3" data-k="referensi"></div>
+      <div><label for="f-r4">Penyaji</label><input type="text" id="f-r4" data-k="penyaji"></div>
+    </div>
+  </div>
+
+  <div class="panel part" id="part1">
+    <h3><span class="pn">1</span>Memahami masalah</h3>
+    <label for="f-info">Informasi penting dari kasus</label>
+    <textarea id="f-info" data-k="info" placeholder="Contoh: tayang 14 hari lagi, sisa dana Rp2.500.000"></textarea>
+    <label for="f-tanya">Apa yang perlu kita ketahui?</label>
+    <input type="text" id="f-tanya" data-k="tanya">
+  </div>
+
+  <div class="panel part" id="part2">
+    <h3><span class="pn">2</span>Tugas A: tahapan produksi</h3>
+    <p class="small muted">Tulis minimal 4 kegiatan per tahap, satu kegiatan per baris.</p>
+    <div class="grid3">
+      <div><label for="f-pra">Praproduksi <span class="pill" data-count="pra">0</span></label><textarea id="f-pra" data-k="pra" style="min-height:160px"></textarea></div>
+      <div><label for="f-pro">Produksi <span class="pill" data-count="pro">0</span></label><textarea id="f-pro" data-k="pro" style="min-height:160px"></textarea></div>
+      <div><label for="f-pas">Pascaproduksi <span class="pill" data-count="pas">0</span></label><textarea id="f-pas" data-k="pas" style="min-height:160px"></textarea></div>
+    </div>
+    <label for="f-lewat">Kegiatan yang terlewat pada kasus</label>
+    <textarea id="f-lewat" data-k="terlewat"></textarea>
+  </div>
+
+  <div class="panel part" id="part3">
+    <h3><span class="pn">3</span>Tugas B: organisasi dan jabatan <span class="pill" id="poscount">0 posisi</span></h3>
+    <p class="small muted">Minimal 8 posisi, tugas jelas dan tidak tumpang tindih.</p>
+    <div class="rows" id="posrows"></div>
+    <button class="btn small ghost" type="button" id="addpos" style="margin-top:12px">Tambah posisi</button>
+    <div class="grid2">
+      <div><label for="f-izin">Penanggung jawab izin lokasi</label><input type="text" id="f-izin" data-k="pjIzin"></div>
+      <div><label for="f-nara">Penanggung jawab narasumber</label><input type="text" id="f-nara" data-k="pjNarasumber"></div>
+    </div>
+  </div>
+
+  <div class="panel part" id="part4">
+    <h3><span class="pn">4</span>Tugas C: sumber daya produksi</h3>
+    <div class="grid2">
+      <div><label for="f-sdm">SDM (kru dan talent)</label><textarea id="f-sdm" data-k="sdm"></textarea></div>
+      <div><label for="f-alat">Peralatan dan cara memastikan ketersediaannya</label><textarea id="f-alat" data-k="alat"></textarea></div>
+    </div>
+    <h4 style="margin-top:18px">Usulan penggunaan sisa anggaran (Rp2.500.000)</h4>
+    <div class="rows" id="budrows"></div>
+    <button class="btn small ghost" type="button" id="addbud" style="margin-top:12px">Tambah rincian</button>
+    <p style="margin-top:12px">Total <strong id="budtotal">Rp0</strong>, sisa <strong id="budleft">Rp2.500.000</strong> <span class="pill" id="budstatus">Belum diisi</span></p>
+    <label for="f-alasan">Alasan prioritas</label><textarea id="f-alasan" data-k="alasan"></textarea>
+    <h4 style="margin-top:18px">Jadwal kerja 14 hari menuju tayang</h4>
+    <div class="timeline">
+      <div><label for="f-w1">H-14 s.d. H-10</label><textarea id="f-w1" data-k="w1"></textarea></div>
+      <div><label for="f-w2">H-9 s.d. H-5</label><textarea id="f-w2" data-k="w2"></textarea></div>
+      <div><label for="f-w3">H-4 s.d. H-1</label><textarea id="f-w3" data-k="w3"></textarea></div>
+      <div><label for="f-w4">Hari H</label><textarea id="f-w4" data-k="w4"></textarea></div>
+    </div>
+  </div>
+
+  <div class="panel part" id="part5">
+    <h3><span class="pn">5</span>Solusi empat masalah</h3>
+    <div class="grid2" id="solutions"></div>
+  </div>
+
+  <div class="panel part" id="part6">
+    <h3><span class="pn">6</span>Refleksi individu</h3>
+    <div class="grid2">
+      <div><label for="f-nama">Nama saya</label><input type="text" id="f-nama" data-k="refNama"></div>
+      <div><label>Perasaan saya setelah belajar</label>
+        <div class="mood" role="group" aria-label="Perasaan">
+          <button type="button" data-mood="Senang dan paham">😄 Paham</button>
+          <button type="button" data-mood="Cukup paham">🙂 Cukup</button>
+          <button type="button" data-mood="Masih bingung">😕 Bingung</button>
+        </div>
+      </div>
+    </div>
+    <label for="f-ref1">Hal paling penting yang saya pelajari hari ini</label><textarea id="f-ref1" data-k="ref1"></textarea>
+    <label for="f-ref2">Bagian yang masih sulit bagi saya</label><textarea id="f-ref2" data-k="ref2"></textarea>
+    <label for="f-ref3">Peran saya dalam kelompok dan yang bisa saya perbaiki</label><textarea id="f-ref3" data-k="ref3"></textarea>
+  </div>
+
+  <div class="panel part">
+    <h3>Lembar tanggapan untuk kelompok penyaji</h3>
+    <div class="grid3">
+      <div><label for="f-t1">Kelompok yang ditanggapi</label><input type="text" id="f-t1" data-k="tKelompok"></div>
+      <div><label for="f-t2">Satu kelebihan</label><input type="text" id="f-t2" data-k="tLebih"></div>
+      <div><label for="f-t3">Satu saran</label><input type="text" id="f-t3" data-k="tSaran"></div>
+    </div>
+  </div>
+
+  <div class="panel part">
+    <h3>Kumpulkan hasil</h3>
+    <p class="small muted">Buat teks lengkap Rencana Kerja Produksi, lalu salin ke Google Drive, Canva, atau platform tugas kelas.</p>
+    <div class="btnrow">
+      <button class="btn" type="button" id="mkexport">Buat teks hasil</button>
+      <button class="btn ghost" type="button" id="copyexport" hidden>Salin teks</button>
+      <button class="btn ghost" type="button" id="clearlkpd">Kosongkan lembar kerja</button>
+    </div>
+    <div id="exportbox" hidden style="margin-top:14px"><textarea id="exporttext" readonly aria-label="Teks hasil lembar kerja"></textarea></div>
+  </div>
+</section>
+
+<!-- ================= KUIS ================= -->
+<section class="view" id="v-kuis">
+  <div class="quiz">
+    <div class="pagehead"><h2>Kuis penutup</h2><p class="muted">Lima soal tentang tahapan produksi, organisasi, dan sumber daya. <span id="q-best"></span></p></div>
+    <div class="panel" id="quizbox" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ================= GURU ================= -->
+<section class="view guru-only" id="v-guru">
+  <div class="pagehead"><h2>Panel Guru</h2></div>
+  <div class="seg" role="group" aria-label="Alat guru">
+    <button type="button" data-g="rundown" aria-pressed="true">Pengatur waktu kelas</button>
+    <button type="button" data-g="rubrik" aria-pressed="false">Rubrik produk</button>
+    <button type="button" data-g="observasi" aria-pressed="false">Lembar observasi</button>
+    <button type="button" data-g="kunci" aria-pressed="false">Diagnostik dan kunci</button>
+  </div>
+
+  <div data-gview="rundown">
+    <div class="rundown">
+      <div class="phases" id="phases"></div>
+      <div class="panel">
+        <div class="muted small" id="ph-name"></div>
+        <div class="clock" id="clock">10:00</div>
+        <div class="btnrow">
+          <button class="btn red" type="button" id="t-start">Mulai</button>
+          <button class="btn ghost" type="button" id="t-next">Fase berikutnya</button>
+          <button class="btn ghost" type="button" id="t-reset">Ulang fase</button>
+        </div>
+        <ul class="checklist" id="ph-steps"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div data-gview="rubrik" hidden>
+    <p class="muted prose">Skor 1–4 per aspek. Nilai = jumlah skor ÷ 20 × 100. Tuntas ≥ 75, remedial &lt; 75, pengayaan ≥ 90.</p>
+    <div class="tablewrap"><table id="rubtable"></table></div>
+    <div class="btnrow"><button class="btn small" type="button" id="addgroup">Tambah kelompok</button><button class="btn small ghost" type="button" id="showrub">Lihat deskriptor rubrik</button></div>
+    <div class="tablewrap rubric mt" id="rubdesc" hidden><table>
+      <thead><tr><th>Aspek</th><th>4 (Sangat baik)</th><th>3 (Baik)</th><th>2 (Cukup)</th><th>1 (Perlu bimbingan)</th></tr></thead>
+      <tbody>
+        <tr><td><b>Tahapan produksi</b></td><td>Tiga tahap lengkap, urut, kegiatan tepat dan menjawab kasus</td><td>Lengkap dan urut, 1–2 kegiatan kurang tepat</td><td>Ada tahap tidak lengkap</td><td>Banyak kegiatan keliru</td></tr>
+        <tr><td><b>Organisasi dan tugas</b></td><td>Minimal 8 posisi, tugas jelas tanpa tumpang tindih</td><td>6–7 posisi, tugas jelas</td><td>4–5 posisi, ada tumpang tindih</td><td>Kurang dari 4 posisi</td></tr>
+        <tr><td><b>Sumber daya</b></td><td>Empat jenis terpetakan, anggaran dihitung dan masuk akal</td><td>Empat jenis ada, perhitungan kurang rinci</td><td>Tiga jenis atau perhitungan keliru</td><td>Dua jenis atau kurang</td></tr>
+        <tr><td><b>Solusi atas kasus</b></td><td>Empat masalah terjawab dengan alasan</td><td>Tiga masalah terjawab</td><td>Satu–dua terjawab</td><td>Tidak menjawab kasus</td></tr>
+        <tr><td><b>Presentasi dan kerja sama</b></td><td>Jelas, runtut, semua anggota berperan</td><td>Cukup jelas, sebagian berperan</td><td>Kurang runtut</td><td>Tidak siap</td></tr>
+      </tbody></table></div>
+  </div>
+
+  <div data-gview="observasi" hidden>
+    <p class="muted prose">4 = sangat baik (aktif dan mandiri), 3 = baik, 2 = cukup (perlu diingatkan), 1 = perlu bimbingan. Diisi selama fase 2–4.</p>
+    <div class="tablewrap"><table id="obstable"></table></div>
+    <div class="btnrow"><button class="btn small" type="button" id="addobs">Tambah baris</button></div>
+  </div>
+
+  <div data-gview="kunci" hidden>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Asesmen diagnostik</h3>
+        <ol><li>Apa yang dimaksud produksi program televisi?</li><li>Sebutkan profesi yang kamu ketahui dalam produksi televisi.</li><li>Apa yang dimaksud praproduksi?</li></ol>
+        <h4>Apersepsi</h4>
+        <p>“Apa yang terjadi sebelum, saat, dan sesudah sebuah program ditayangkan?” dan “Siapa saja yang bekerja untuk menghasilkan tayangan ini?” Bisa ditunjukkan langsung lewat Studio 3D.</p>
+        <h4>Pertanyaan penuntun saat berkeliling</h4>
+        <p>“Apa dampaknya jika posisi ini tidak ada?”</p>
+      </div>
+      <div class="panel">
+        <h3>Contoh solusi empat masalah</h3>
+        <ol>
+          <li><strong>Tugas tumpang tindih.</strong> Rapat produksi, bagan organisasi, dan uraian tugas tertulis. Unit Manager mengurus izin lokasi; Asisten Produser mengurus narasumber.</li>
+          <li><strong>Alat dipinjam program lain.</strong> Daftar kebutuhan alat dan booking ke bagian teknik sejak praproduksi, dengan formulir peminjaman dan alat cadangan.</li>
+          <li><strong>Anggaran membengkak.</strong> Sisa Rp2.500.000 diprioritaskan untuk editing, grafis, quality control, dan dana cadangan. Pengeluaran yang tidak mendesak ditunda; Unit Manager mencatat pengeluaran harian.</li>
+          <li><strong>Naskah terlambat.</strong> Jadwal kerja dihitung mundur dari tanggal tayang: naskah final sekitar H-8, latihan sekitar H-7, syuting H-6.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div></main>
+</div>
+
+<!-- The 3D studio lives here and is moved between the home hero and the Studio 3D page -->
+<div id="stage" class="stage">
+  <div class="pins" id="pins"></div>
+  <div class="nogl" id="nogl">Tampilan 3D tidak dapat dimuat di perangkat ini. Materi lain tetap dapat digunakan.</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+"use strict";
+/* ================= storage & helpers ================= */
+var KEY="studio-manajemen-siaran-v1";
+var S={mode:"murid",lkpd:{},pos:[],bud:[],rub:[],obs:[],best:null,checks:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&typeof p==="object"){for(var k in p)S[k]=p[k];}}}catch(e){}
+var saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S));var m=$("#savedmsg");m.textContent="Tersimpan";setTimeout(function(){m.textContent=""},1400)}catch(e){}},300)}
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+function rp(n){return "Rp"+Math.round(n||0).toLocaleString("id-ID")}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+/* ================= mode & routing ================= */
+var VIEWS=["beranda","studio","materi","misi","simulasi","lkpd","kuis","guru"];
+function setMode(m){S.mode=m;document.body.classList.toggle("is-guru",m==="guru");$$(".mode button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.mode===m?"true":"false")});save();if(m!=="guru"&&location.hash==="#guru")location.hash="#beranda"}
+$$(".mode button").forEach(function(b){b.addEventListener("click",function(){setMode(b.dataset.mode)})});
+setMode(S.mode||"murid");
+var pendingJump=null;
+$$("[data-jump]").forEach(function(a){a.addEventListener("click",function(){pendingJump=a.dataset.jump})});
+function route(){var h=(location.hash||"#beranda").slice(1);if(VIEWS.indexOf(h)<0)h="beranda";if(h==="guru"&&S.mode!=="guru")h="beranda";
+  $$(".view").forEach(function(v){v.classList.toggle("active",v.id==="v-"+h)});
+  $$(".nav a").forEach(function(a){if(a.getAttribute("href")==="#"+h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  Studio.place(h);
+  if(pendingJump){var el=document.getElementById(pendingJump);pendingJump=null;if(el){setTimeout(function(){el.scrollIntoView({behavior:"smooth"})},40);return}}
+  window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);
+function segs(attr,viewAttr){$$("[data-"+attr+"]").forEach(function(b){b.addEventListener("click",function(){showSeg(attr,viewAttr,b.getAttribute("data-"+attr))})})}
+function showSeg(attr,viewAttr,val){$$("[data-"+attr+"]").forEach(function(x){x.setAttribute("aria-pressed",x.getAttribute("data-"+attr)===val?"true":"false")});$$("[data-"+viewAttr+"]").forEach(function(v){v.hidden=v.getAttribute("data-"+viewAttr)!==val})}
+segs("sub","subview");segs("sim","simview");segs("g","gview");
+$$("[data-goto-sub]").forEach(function(b){b.addEventListener("click",function(){showSeg("sub","subview",b.dataset.gotoSub)})});
+
+/* ================= MATERI: tahapan ================= */
+var STAGES=[
+ {id:"pra",cls:"s-pra",name:"Praproduksi",lead:"Merencanakan semua hal sebelum kamera menyala. Tahap terpanjang dan paling menentukan.",acts:[
+  ["Ide, riset, dan target penonton","Menentukan tema, sudut pandang, dan siapa penontonnya; mengumpulkan data pendukung.","Produser, Asisten Produser","Konsep program"],
+  ["Naskah dan daftar pertanyaan","Menulis naskah pembuka-penutup dan alur pertanyaan talkshow.","Penulis Naskah","Naskah"],
+  ["Rundown","Menyusun urutan segmen, durasi tiap segmen, dan jeda iklan.","Produser, Penulis Naskah","Rundown acara"],
+  ["Rapat produksi dan pembagian tugas","Membagi tugas tertulis (job desk) agar tidak ada yang tumpang tindih atau terlewat.","Produser","Daftar job desk"],
+  ["Izin lokasi dan fasilitas","Mengurus surat izin, studio, transportasi, dan konsumsi.","Unit Manager","Surat izin"],
+  ["Narasumber dan talent","Menghubungi, mengonfirmasi jadwal, dan memberi gambaran topik kepada narasumber.","Asisten Produser","Daftar narasumber"],
+  ["Anggaran (RAB)","Menghitung biaya dari praproduksi sampai tayang, termasuk dana cadangan sekitar 10%.","Produser, Unit Manager","Rencana anggaran biaya"],
+  ["Jadwal kerja (time schedule)","Menyusun jadwal mundur dari tanggal tayang, lengkap dengan tenggat.","Produser","Jadwal kerja"],
+  ["Booking peralatan dan studio","Mengajukan peminjaman kamera, lampu, audio, dan studio ke bagian teknik.","Unit Manager","Formulir peminjaman"],
+  ["Latihan (rehearsal)","Menguji naskah, blocking, dan teknis bersama kru dan host.","Sutradara","Catatan perbaikan"]]},
+ {id:"pro",cls:"s-pro",name:"Produksi",lead:"Mewujudkan rencana menjadi gambar dan suara, sesuai naskah dan rundown.",acts:[
+  ["Menata set dan lampu","Memasang set, properti, dan mengatur lampu sesuai desain.","Penata Artistik, Penata Cahaya","Set siap pakai"],
+  ["Cek kamera dan check sound","Memastikan semua kamera, mikrofon, dan intercom berfungsi.","Kameramen, Penata Suara","Alat siap"],
+  ["Briefing kru dan talent","Menjelaskan alur acara, posisi, dan aba-aba kepada semua yang terlibat.","Sutradara, Floor Director","Semua paham alur"],
+  ["Blocking","Menentukan posisi duduk talent dan posisi kamera untuk setiap segmen.","Sutradara","Posisi terkunci"],
+  ["Pengambilan gambar","Merekam atau menyiarkan sesuai rundown; sutradara memberi perintah, switcher memilih kamera.","Sutradara, Switcher, Kameramen","Materi rekaman"],
+  ["Pencatatan durasi dan log","Mencatat durasi segmen dan nomor rekaman untuk memudahkan editing.","Asisten Produser","Log rekaman"]]},
+ {id:"pas",cls:"s-pas",name:"Pascaproduksi",lead:"Mengolah hasil rekaman menjadi tayangan utuh yang siap disiarkan.",acts:[
+  ["Memilah materi rekaman","Memeriksa dan memilih bagian rekaman yang akan dipakai.","Editor","Daftar materi"],
+  ["Editing gambar dan suara","Menyusun rekaman sesuai rundown dan durasi 30 menit.","Editor","Hasil suntingan"],
+  ["Grafis dan teks layar","Membuat nama narasumber (lower third), judul, dan bumper.","Desainer Grafis","Paket grafis"],
+  ["Musik dan mixing audio","Menambah musik berlisensi dan menyamakan level suara.","Editor, Penata Suara","Audio bersih"],
+  ["Preview dan quality control","Menonton ulang untuk mengecek kesalahan teknis dan isi.","Produser","Materi lolos QC"],
+  ["Penayangan, promosi, evaluasi","Menyerahkan materi ke bagian siaran, mempromosikan, lalu mengevaluasi tanggapan penonton.","Produser","Program tayang"]]}
+];
+var curStage="pra";
+function renderStage(){
+  $("#stagecards").innerHTML=STAGES.map(function(s,i){return '<button type="button" class="scard '+s.cls+'" data-stage="'+s.id+'" aria-pressed="'+(s.id===curStage)+'"><span class="big">'+(i+1)+'</span><h3>'+s.name+"</h3><p>"+s.lead+"</p></button>"}).join("");
+  var s=STAGES.filter(function(x){return x.id===curStage})[0];
+  $("#stagebody").innerHTML='<div class="acts">'+s.acts.map(function(a,i){return '<div class="act"><span class="no">'+(i+1)+'</span><div><h4>'+a[0]+"</h4><p>"+a[1]+'</p></div><div class="meta"><span class="muted">Penanggung jawab</span><b>'+a[2]+'</b><span class="pill '+s.id+'">'+a[3]+"</span></div></div>"}).join("")+"</div>";
+  $$("[data-stage]").forEach(function(b){b.addEventListener("click",function(){curStage=b.dataset.stage;renderStage()})});
+}
+renderStage();
+
+/* ================= MATERI: organisasi ================= */
+var ROLES={
+ "Direktur Utama":["Memimpin seluruh stasiun dan menetapkan arah kebijakan perusahaan.","Semua tahap","Menyetujui program baru seperti Ngobrol Makassar."],
+ "Direktur Program":["Merencanakan semua program acara dan jadwal tayangnya.","Praproduksi","Menetapkan tanggal tayang perdana 14 hari lagi."],
+ "Direktur Pemberitaan":["Mengelola program berita agar akurat dan berimbang.","Semua tahap","Tidak terlibat langsung di talkshow ini."],
+ "Direktur Teknik":["Mengelola peralatan, studio, dan pemancar. Mengatur peminjaman alat antarprogram.","Semua tahap","Bagian inilah yang harus menerima booking kamera dan lampu (masalah 2)."],
+ "Direktur Pemasaran":["Menjual slot iklan dan sponsor sebagai sumber pendapatan stasiun.","Pascaproduksi","Sponsor bisa menambah dana program."],
+ "Direktur Keuangan dan Umum":["Mengelola keuangan, SDM, dan administrasi, termasuk persetujuan anggaran program.","Praproduksi","Menyetujui anggaran Rp12.000.000."],
+ "Executive Producer":["Mengawasi beberapa program sekaligus, menyetujui konsep dan anggaran.","Praproduksi","Tempat produser melapor saat anggaran membengkak."],
+ "Produser":["Penanggung jawab keseluruhan program: ide, anggaran, jadwal, dan koordinasi tim.","Semua tahap","Harus memimpin rapat produksi dan membagi tugas (masalah 1)."],
+ "Asisten Produser":["Membantu produser, riset, serta mencari dan menghubungi narasumber.","Praproduksi, produksi","Penanggung jawab narasumber yang tepat (masalah 1)."],
+ "Penulis Naskah":["Menyusun naskah, alur pertanyaan talkshow, dan narasi.","Praproduksi","Naskah harus selesai lebih awal (masalah 4)."],
+ "Unit Manager":["Mengurus izin lokasi, fasilitas, logistik, dan mencatat pengeluaran harian.","Praproduksi, produksi","Penanggung jawab izin lokasi dan pengendali pengeluaran (masalah 1 dan 3)."],
+ "Sutradara":["Program Director. Menerjemahkan naskah menjadi gambar dan memimpin kru saat produksi.","Praproduksi, produksi","Memimpin latihan yang terlewat (masalah 4)."],
+ "Floor Director":["Wakil sutradara di lantai studio; memberi aba-aba dan hitungan mundur kepada host.","Produksi","Menjaga acara berjalan sesuai rundown."],
+ "Kameramen":["Mengoperasikan kamera: framing, fokus, dan gerak sesuai arahan sutradara.","Produksi","Butuh kamera yang sudah dibooking (masalah 2)."],
+ "Penata Cahaya":["Mengatur lampu agar gambar terang dan sesuai suasana program.","Produksi","Butuh lampu yang sudah dibooking (masalah 2)."],
+ "Penata Suara":["Merekam dan menjaga kualitas audio, termasuk mikrofon host dan narasumber.","Produksi, pascaproduksi","Mengatur mikrofon clip-on dan audio mixer."],
+ "Switcher (TD)":["Technical Director. Memindahkan gambar antarkamera di ruang kontrol atas perintah sutradara.","Produksi","Bekerja di ruang kontrol."],
+ "Penata Artistik":["Merancang set, properti, dan dekorasi yang mencerminkan identitas program.","Praproduksi, produksi","Mengangkat motif budaya Bugis-Makassar di set."],
+ "Editor":["Menyusun hasil rekaman menjadi tayangan utuh sesuai naskah dan durasi.","Pascaproduksi","Honornya harus aman dari sisa anggaran (masalah 3)."],
+ "Desainer Grafis":["Membuat grafis, nama narasumber (lower third), dan bumper.","Pascaproduksi","Bagian dari prioritas anggaran tersisa."],
+ "Host":["Membawakan acara dan memandu obrolan bersama narasumber.","Produksi","Perlu latihan dengan naskah final (masalah 4)."]
+};
+function node(n,extra){return '<button type="button" class="node '+(extra||"")+'" data-role="'+esc(n)+'">'+esc(n)+"</button>"}
+$("#org-station").innerHTML='<div class="lvl">'+node("Direktur Utama","top")+'</div><div class="branch" style="gap:8px">'+["Direktur Program","Direktur Pemberitaan","Direktur Teknik","Direktur Pemasaran","Direktur Keuangan dan Umum"].map(function(n){return node(n)}).join("")+"</div>";
+function column(t,l,items){return '<div class="col"><div class="colname">'+t+"</div>"+node(l,"lead")+items.map(function(n){return node(n)}).join("")+"</div>"}
+$("#org-team").innerHTML='<div class="lvl">'+node("Executive Producer","top")+'</div><div class="lvl">'+node("Produser","top")+'</div><div class="branch">'+column("Perencanaan","Asisten Produser",["Penulis Naskah","Unit Manager"])+column("Produksi","Sutradara",["Floor Director","Kameramen","Penata Cahaya","Penata Suara","Switcher (TD)","Penata Artistik","Host"])+column("Pascaproduksi","Editor",["Desainer Grafis"])+"</div>";
+$$(".node").forEach(function(b){b.addEventListener("click",function(){$$(".node").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");var n=b.dataset.role,r=ROLES[n];
+  $("#roleinfo").innerHTML="<h3>"+esc(n)+"</h3><p>"+r[0]+'</p><dl class="info" style="grid-template-columns:auto 1fr"><dt>Tahap kerja</dt><dd>'+r[1]+'</dd><dt>Dalam kasus</dt><dd style="font-weight:500">'+r[2]+"</dd></dl>"})});
+
+/* ================= MATERI: sumber daya ================= */
+var SDM=[["Produser","1","Memimpin program"],["Asisten Produser","1","Riset dan narasumber"],["Penulis Naskah","1","Naskah dan rundown"],["Unit Manager","1","Izin, fasilitas, keuangan harian"],["Sutradara","1","Memimpin produksi"],["Floor Director","1","Aba-aba di studio"],["Kameramen","3","Kamera 1, 2, 3"],["Penata Cahaya","1","Lampu"],["Penata Suara","1","Audio"],["Switcher (TD)","1","Ruang kontrol"],["Penata Artistik","1","Set dan properti"],["Editor","1","Pascaproduksi"],["Desainer Grafis","1","Grafis layar"],["Host","1","Pemandu acara"],["Narasumber","2","Tamu per episode"]];
+$("#sdmtable").innerHTML="<thead><tr><th>Posisi</th><th class='num'>Jumlah</th><th>Keterangan</th></tr></thead><tbody>"+SDM.map(function(r){return "<tr><td><b>"+r[0]+"</b></td><td class='num'>"+r[1]+"</td><td>"+r[2]+"</td></tr>"}).join("")+"</tbody>";
+var ALAT=[["Kamera studio + pedestal","3","Merekam dari tiga sudut"],["Teleprompter","1","Menampilkan naskah di depan lensa"],["Lampu fresnel / LED","6","Key, fill, back, dan latar"],["Mikrofon clip-on","3","Suara host dan narasumber"],["Audio mixer","1","Mengatur level suara"],["Video switcher","1","Memilih gambar kamera"],["Monitor","6","Program, preview, kamera"],["Intercom (headset)","6","Komunikasi sutradara dan kru"],["Komputer editing","1","Pascaproduksi"]];
+$("#alattable").innerHTML="<thead><tr><th>Alat</th><th class='num'>Jumlah</th><th>Fungsi</th></tr></thead><tbody>"+ALAT.map(function(r){return "<tr><td><b>"+r[0]+"</b></td><td class='num'>"+r[1]+"</td><td>"+r[2]+"</td></tr>"}).join("")+"</tbody>";
+var RAB=[["Praproduksi",[["Riset dan transportasi",500000],["Rapat produksi dan konsumsi",500000],["Honor penulis naskah",1000000]]],
+ ["Produksi",[["Honor host",1500000],["Honor narasumber (2 orang)",1000000],["Sewa alat tambahan",2000000],["Set dan properti",1000000],["Konsumsi kru saat syuting",1000000]]],
+ ["Pascaproduksi",[["Honor editor (3 hari)",900000],["Sewa ruang editing",400000],["Grafis dan teks layar",300000],["Quality control dan penyerahan materi",250000],["Promosi media sosial",300000],["Musik latar berlisensi",150000]]],
+ ["Dana cadangan",[["Kontingensi sekitar 10%",1200000]]]];
+var rabHtml="<thead><tr><th>Pos anggaran</th><th class='num'>Biaya</th></tr></thead><tbody>",grand=0;
+RAB.forEach(function(g){var sub=g[1].reduce(function(a,b){return a+b[1]},0);grand+=sub;rabHtml+="<tr class='sub'><td>"+g[0]+"</td><td class='num'>"+rp(sub)+"</td></tr>"+g[1].map(function(i){return "<tr><td style='padding-left:28px'>"+i[0]+"</td><td class='num'>"+rp(i[1])+"</td></tr>"}).join("")});
+rabHtml+="<tr class='sub'><td>Total</td><td class='num'>"+rp(grand)+"</td></tr></tbody>";$("#rabtable").innerHTML=rabHtml;
+
+/* ================= MATERI: jadwal ================= */
+var GANTT=[["Riset, konsep, target penonton",14,12,"pra"],["Rapat produksi dan job desk",12,12,"pra"],["Naskah dan rundown (final H-8)",12,8,"pra"],["Izin lokasi dan narasumber",12,7,"pra"],["RAB dan booking alat",11,9,"pra"],["Latihan (rehearsal)",7,7,"pra"],["Syuting di studio",6,6,"pro"],["Editing, grafis, audio",5,3,"pas"],["Preview dan quality control",2,2,"pas"],["Promosi",7,1,"pas"],["Tayang perdana",0,0,"tay"]];
+var gh='<div class="hd" style="justify-content:flex-start;padding-left:12px">Kegiatan</div>';for(var d=14;d>=0;d--)gh+='<div class="hd">'+(d===0?"H":"H-"+d)+"</div>";
+GANTT.forEach(function(r){gh+='<div class="lab">'+r[0]+"</div>";for(var d=14;d>=0;d--){var on=d<=r[1]&&d>=r[2];gh+=on?'<div class="bar c-'+r[3]+(d===r[1]?" s":"")+(d===r[2]?" e":"")+'"><span></span></div>':"<div></div>"}});
+$("#gantt").innerHTML=gh;
+
+/* ================= MATERI: istilah ================= */
+var TERMS=[["Rundown","Susunan acara berisi urutan segmen, durasi, dan jeda iklan."],["Naskah","Teks yang berisi narasi, dialog, atau alur pertanyaan program."],["Time schedule","Jadwal kerja produksi dengan tenggat setiap kegiatan."],["RAB","Rencana anggaran biaya; rincian biaya setiap kebutuhan produksi."],["Job desk","Uraian tugas tertulis untuk setiap posisi."],["Booking","Pemesanan alat atau studio untuk tanggal tertentu."],["Rehearsal","Latihan sebelum produksi untuk menguji naskah dan teknis."],["Blocking","Pengaturan posisi talent dan kamera untuk setiap adegan atau segmen."],["Cue","Aba-aba dari floor director kepada host untuk mulai, berhenti, atau berpindah."],["Take","Satu kali pengambilan gambar; juga perintah untuk menayangkan kamera tertentu."],["Tally light","Lampu merah di kamera yang menyala saat kamera itu sedang tayang."],["Teleprompter","Layar di depan lensa yang menampilkan naskah agar host tetap menatap kamera."],["Lower third","Grafis teks di bagian bawah layar, misalnya nama narasumber."],["Three-point lighting","Teknik tiga lampu: key light, fill light, dan back light."],["Switcher","Alat untuk berpindah dari gambar satu kamera ke kamera lain."],["Program (PGM)","Gambar yang sedang tayang ke penonton."],["Preview (PVW)","Gambar yang disiapkan untuk tayang berikutnya."],["Quality control","Pemeriksaan akhir mutu gambar, suara, dan isi sebelum tayang."],["Talkshow","Program perbincangan antara host dan narasumber."],["Target penonton","Kelompok penonton yang dituju sebuah program."],["Above the line","Kru kreatif inti: produser, sutradara, penulis, talent."],["Below the line","Kru teknis: kamera, cahaya, suara, editor."],["Kontingensi","Dana cadangan untuk kebutuhan tak terduga, biasanya sekitar 10%."],["Intercom","Sistem headset untuk komunikasi sutradara dengan kru di studio."]];
+function renderTerms(q){q=(q||"").toLowerCase();var list=TERMS.filter(function(t){return !q||t[0].toLowerCase().indexOf(q)>=0||t[1].toLowerCase().indexOf(q)>=0});
+  $("#terms").innerHTML=list.length?list.map(function(t){return '<div class="term"><b>'+t[0]+"</b><span>"+t[1]+"</span></div>"}).join(""):'<p class="muted">Istilah tidak ditemukan. Coba kata lain.</p>'}
+$("#termsearch").addEventListener("input",function(){renderTerms(this.value)});renderTerms("");
+
+/* ================= MISI ================= */
+var PROBLEMS=[
+ {t:"Tidak ada yang tahu siapa yang harus mengurus izin lokasi dan narasumber. Dua orang mengerjakan hal yang sama, yang lain tidak mengerjakan apa pun.",l:"Terkait organisasi dan pembagian tugas"},
+ {t:"Pada hari syuting, kamera dan lampu ternyata dipinjam program lain.",l:"Terkait sumber daya peralatan"},
+ {t:"Anggaran disetujui Rp12.000.000, pengeluaran sudah Rp9.500.000, padahal editing dan penayangan belum dimulai.",l:"Terkait sumber daya anggaran"},
+ {t:"Naskah baru selesai sehari sebelum syuting sehingga kru tidak sempat berlatih.",l:"Terkait sumber daya waktu dan tahapan praproduksi"}];
+$("#problems").innerHTML=PROBLEMS.map(function(p,i){return '<li class="problem"><span class="n">'+(i+1)+"</span><div>"+p.t+'<div class="link">'+p.l+"</div></div></li>"}).join("");
+
+/* ================= SIMULASI: cocokkan ================= */
+var PAIRS=[["Produser","Bertanggung jawab atas keseluruhan program: ide, anggaran, dan jadwal."],["Sutradara","Mengarahkan kru dan talent saat produksi agar gambar sesuai konsep."],["Penulis Naskah","Menyusun naskah dan alur pertanyaan talkshow."],["Unit Manager","Mengurus izin lokasi, fasilitas, dan pengeluaran harian produksi."],["Floor Director","Memberi aba-aba kepada host dan talent di lantai studio."],["Kameramen","Mengoperasikan kamera dan mengambil gambar sesuai arahan."],["Penata Cahaya","Mengatur lampu agar gambar terang dan sesuai suasana."],["Penata Suara","Merekam dan menjaga kualitas audio."],["Editor","Menyusun hasil rekaman menjadi tayangan utuh."],["Asisten Produser","Mencari dan menghubungi narasumber serta membantu produser."],["Switcher (TD)","Memindahkan gambar antarkamera di ruang kontrol."]];
+var M={};
+function mStart(){M={set:shuffle(PAIRS).slice(0,8),a:null,b:null,done:0,miss:0};
+  $("#m-left").innerHTML=M.set.map(function(p,i){return '<button type="button" class="chip" data-i="'+i+'"><strong>'+p[0]+"</strong></button>"}).join("");
+  $("#m-right").innerHTML=shuffle(M.set.map(function(p,i){return i})).map(function(i){return '<button type="button" class="chip" data-i="'+i+'">'+M.set[i][1]+"</button>"}).join("");
+  $("#m-result").innerHTML="";mScore();
+  $$("#m-left .chip").forEach(function(b){b.addEventListener("click",function(){if(b.disabled)return;$$("#m-left .chip").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");M.a=b;mTry()})});
+  $$("#m-right .chip").forEach(function(b){b.addEventListener("click",function(){if(b.disabled)return;$$("#m-right .chip").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");M.b=b;mTry()})})}
+function mTry(){if(!M.a||!M.b)return;var a=M.a,b=M.b;M.a=M.b=null;a.classList.remove("sel");b.classList.remove("sel");
+  if(a.dataset.i===b.dataset.i){a.classList.add("done");b.classList.add("done");a.disabled=b.disabled=true;M.done++}
+  else{M.miss++;[a,b].forEach(function(x){x.classList.remove("wrong");void x.offsetWidth;x.classList.add("wrong");setTimeout(function(){x.classList.remove("wrong")},700)})}
+  mScore();if(M.done===8)$("#m-result").innerHTML='<div class="feedback ok"><strong>Semua jabatan tercocokkan.</strong> '+(M.miss===0?"Sempurna tanpa salah.":"Dengan "+M.miss+" kali salah. Acak ulang untuk berlatih lagi.")+"</div>"}
+function mScore(){$("#m-score").textContent="Cocok "+M.done+"/8";$("#m-miss").textContent="Salah "+M.miss}
+$("#m-reset").addEventListener("click",mStart);mStart();
+
+/* ================= SIMULASI: pilah ================= */
+var CARDS=[["Riset ide dan tema program",0],["Menulis naskah dan rundown",0],["Mengurus izin lokasi",0],["Mengonfirmasi narasumber",0],["Menyusun anggaran",0],["Booking kamera dan lampu",0],["Briefing kru sebelum take",1],["Check sound dan cek kamera",1],["Pengambilan gambar sesuai rundown",1],["Menata lampu dan set studio",1],["Editing gambar dan suara",2],["Menambahkan grafis dan teks",2],["Preview dan quality control",2],["Penayangan dan evaluasi program",2]];
+var SG={};
+function sStart(){SG={sel:null,ok:0,miss:0};
+  $("#s-deck").innerHTML=shuffle(CARDS.map(function(c,i){return i})).map(function(i){return '<button type="button" class="chip" data-i="'+i+'">'+CARDS[i][0]+"</button>"}).join("");
+  $("#s-bins").innerHTML=["Praproduksi","Produksi","Pascaproduksi"].map(function(n,i){return '<button type="button" class="bin" data-b="'+i+'"><span class="pill '+["pra","pro","pas"][i]+'">'+n+'</span><div class="list"></div></button>'}).join("");
+  $("#s-result").innerHTML="";sScore();
+  $$("#s-deck .chip").forEach(function(c){c.addEventListener("click",function(){$$("#s-deck .chip").forEach(function(x){x.classList.remove("sel")});c.classList.add("sel");SG.sel=c})});
+  $$("#s-bins .bin").forEach(function(b){b.addEventListener("click",function(){if(!SG.sel)return;var c=SG.sel,i=+c.dataset.i;
+    if(CARDS[i][1]===+b.dataset.b){SG.ok++;var d=document.createElement("div");d.className="placed";d.textContent=CARDS[i][0];$(".list",b).appendChild(d);c.remove();SG.sel=null}
+    else{SG.miss++;c.classList.remove("wrong");void c.offsetWidth;c.classList.add("wrong")}
+    sScore();if(SG.ok===CARDS.length)$("#s-result").innerHTML='<div class="feedback ok"><strong>Semua kegiatan sudah di tahap yang tepat.</strong> Perhatikan: kegiatan yang gagal dilakukan tim “Ngobrol Makassar” hampir semuanya ada di praproduksi.</div>'})})}
+function sScore(){$("#s-score").textContent="Benar "+SG.ok+"/"+CARDS.length;$("#s-miss").textContent="Salah "+SG.miss}
+$("#s-reset").addEventListener("click",sStart);sStart();
+
+/* ================= SIMULASI: anggaran ================= */
+var SISA=2500000;
+var BITEMS=[{n:"Honor editor (3 hari)",c:900000,e:1,why:"tanpa editor, rekaman tidak bisa menjadi tayangan"},{n:"Sewa ruang dan perangkat editing",c:400000},{n:"Grafis, teks layar, dan bumper",c:300000,e:1,why:"nama narasumber dan identitas program wajib tampil"},{n:"Quality control dan penyerahan materi",c:250000,e:1,why:"materi harus lolos QC sebelum disiarkan"},{n:"Dana cadangan (kontingensi)",c:250000,e:1,why:"cadangan menjaga agar anggaran tidak jebol lagi"},{n:"Musik latar berlisensi",c:150000},{n:"Promosi di media sosial",c:300000},{n:"Konsumsi kru pascaproduksi",c:150000},{n:"Syuting ulang seluruh episode",c:1800000,bad:1},{n:"Hadiah kuis untuk penonton",c:500000,bad:1}];
+$("#b-items").innerHTML=BITEMS.map(function(b,i){return '<label class="bitem" style="margin:0;font-weight:500"><input type="checkbox" data-bi="'+i+'"><span>'+b.n+'</span><span class="cost">'+rp(b.c)+"</span></label>"}).join("");
+function bCalc(){var t=0;$$("[data-bi]").forEach(function(c){if(c.checked)t+=BITEMS[+c.dataset.bi].c});$("#b-total").textContent=rp(t);var left=SISA-t;$("#b-left").textContent=rp(left);$("#b-left").style.color=left<0?"var(--red)":"var(--ink)";var bar=$("#b-bar");bar.style.width=Math.min(100,t/SISA*100)+"%";bar.style.background=left<0?"var(--red)":"var(--teal)";$("#b-feedback").innerHTML="";return t}
+$$("[data-bi]").forEach(function(c){c.addEventListener("change",bCalc)});
+$("#b-check").addEventListener("click",function(){var t=bCalc(),msgs=[],picked={};$$("[data-bi]").forEach(function(c){picked[c.dataset.bi]=c.checked});
+  if(!t){$("#b-feedback").innerHTML='<div class="feedback bad">Pilih dulu pengeluaran yang menurut kelompokmu penting.</div>';return}
+  if(t>SISA)msgs.push("Usulan melebihi sisa dana sebesar "+rp(t-SISA)+". Kurangi pengeluaran yang tidak mendesak.");
+  BITEMS.forEach(function(b,i){if(b.e&&!picked[i])msgs.push(b.n+" belum dipilih, padahal "+b.why+".");if(b.bad&&picked[i])msgs.push(b.n+" bukan prioritas saat dana menipis.")});
+  $("#b-feedback").innerHTML=msgs.length?'<div class="feedback bad"><strong>Perlu diperbaiki:</strong><ul>'+msgs.map(function(m){return "<li>"+esc(m)+"</li>"}).join("")+"</ul></div>":'<div class="feedback ok"><strong>Usulan masuk akal.</strong> Semua kebutuhan wajib terpenuhi dan masih tersisa '+rp(SISA-t)+". Tulis alasan prioritasmu di Lembar Kerja bagian 4.</div>"});
+
+/* ================= LKPD ================= */
+var L=S.lkpd;
+$("#solutions").innerHTML=PROBLEMS.map(function(p,i){return '<div><label for="f-sol'+i+'">Masalah '+(i+1)+'</label><p class="small muted" style="margin:0 0 6px">'+p.t+'</p><textarea id="f-sol'+i+'" data-k="sol'+i+'" placeholder="Solusi dan alasannya"></textarea></div>'}).join("");
+$$("[data-k]").forEach(function(el){if(L[el.dataset.k]!=null)el.value=L[el.dataset.k];el.addEventListener("input",function(){L[el.dataset.k]=el.value;onLkpd()})});
+$$("[data-mood]").forEach(function(b){b.setAttribute("aria-pressed",L.mood===b.dataset.mood?"true":"false");b.addEventListener("click",function(){L.mood=b.dataset.mood;$$("[data-mood]").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});onLkpd()})});
+if(!S.pos.length)S.pos=[{p:"Produser",t:""},{p:"",t:""},{p:"",t:""}];
+if(!S.bud.length)S.bud=[{n:"",c:""},{n:"",c:""}];
+function renderPos(){$("#posrows").innerHTML=S.pos.map(function(r,i){return '<div class="rowin"><input type="text" aria-label="Posisi '+(i+1)+'" placeholder="Posisi" data-pi="'+i+'" data-f="p" value="'+esc(r.p)+'"><input type="text" aria-label="Tugas posisi '+(i+1)+'" placeholder="Tugas dan tanggung jawab" data-pi="'+i+'" data-f="t" value="'+esc(r.t)+'"><button type="button" class="x" data-pdel="'+i+'" aria-label="Hapus posisi '+(i+1)+'">×</button></div>'}).join("");
+  $$("[data-pi]").forEach(function(el){el.addEventListener("input",function(){S.pos[+el.dataset.pi][el.dataset.f]=el.value;onLkpd()})});
+  $$("[data-pdel]").forEach(function(b){b.addEventListener("click",function(){S.pos.splice(+b.dataset.pdel,1);renderPos();onLkpd()})})}
+function renderBud(){$("#budrows").innerHTML=S.bud.map(function(r,i){return '<div class="rowin b"><input type="text" aria-label="Rincian '+(i+1)+'" placeholder="Rincian pengeluaran" data-bdi="'+i+'" data-f="n" value="'+esc(r.n)+'"><input type="number" min="0" step="50000" aria-label="Biaya rincian '+(i+1)+'" placeholder="Biaya (Rp)" data-bdi="'+i+'" data-f="c" value="'+esc(r.c)+'"><button type="button" class="x" data-bdel="'+i+'" aria-label="Hapus rincian '+(i+1)+'">×</button></div>'}).join("");
+  $$("[data-bdi]").forEach(function(el){el.addEventListener("input",function(){S.bud[+el.dataset.bdi][el.dataset.f]=el.value;onLkpd()})});
+  $$("[data-bdel]").forEach(function(b){b.addEventListener("click",function(){S.bud.splice(+b.dataset.bdel,1);renderBud();onLkpd()})})}
+$("#addpos").addEventListener("click",function(){S.pos.push({p:"",t:""});renderPos();onLkpd();$$("#posrows input")[S.pos.length*2-2].focus()});
+$("#addbud").addEventListener("click",function(){S.bud.push({n:"",c:""});renderBud();onLkpd();$$("#budrows input")[S.bud.length*2-2].focus()});
+renderPos();renderBud();
+function lines(t){return (t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean).length}
+function budTotal(){return S.bud.reduce(function(a,r){return a+(parseFloat(r.c)||0)},0)}
+function onLkpd(){
+  ["pra","pro","pas"].forEach(function(k){var n=lines(L[k]),p=$('[data-count="'+k+'"]');p.textContent=n+" kegiatan";p.className="pill "+(n>=4?"ok":"")});
+  var np=S.pos.filter(function(r){return r.p.trim()&&r.t.trim()}).length,pc=$("#poscount");pc.textContent=np+" posisi lengkap";pc.className="pill "+(np>=8?"ok":"");
+  var t=budTotal(),bs=$("#budstatus");$("#budtotal").textContent=rp(t);$("#budleft").textContent=rp(SISA-t);
+  if(!t){bs.textContent="Belum diisi";bs.className="pill"}else if(t>SISA){bs.textContent="Melebihi sisa dana";bs.className="pill bad"}else{bs.textContent="Sesuai sisa dana";bs.className="pill ok"}
+  var checks=[L.kelompok,L.ketua,L.info,L.tanya,lines(L.pra)>=4,lines(L.pro)>=4,lines(L.pas)>=4,L.terlewat,np>=8,L.pjIzin,L.pjNarasumber,L.sdm,L.alat,t>0&&t<=SISA,L.alasan,L.w1,L.w2,L.w3,L.sol0,L.sol1,L.sol2,L.sol3,L.ref1,L.ref2,L.mood];
+  var done=checks.filter(function(c){return typeof c==="string"?c.trim():c}).length,pct=Math.round(done/checks.length*100);
+  $("#progtext").textContent=pct+"% terisi";$("#progfill").style.width=pct+"%";save()}
+onLkpd();
+function buildExport(){var o=[];
+  o.push("RENCANA KERJA PRODUKSI: NGOBROL MAKASSAR","Kelompok: "+(L.kelompok||"-")+" | Kelas: "+(L.kelas||"-"),"Ketua: "+(L.ketua||"-")+"; Pencatat: "+(L.pencatat||"-")+"; Pencari referensi: "+(L.referensi||"-")+"; Penyaji: "+(L.penyaji||"-"));
+  o.push("\n1. MEMAHAMI MASALAH\nInformasi penting: "+(L.info||"-")+"\nYang perlu diketahui: "+(L.tanya||"-"));
+  o.push("\n2. TAHAPAN PRODUKSI\nPraproduksi:\n"+(L.pra||"-")+"\nProduksi:\n"+(L.pro||"-")+"\nPascaproduksi:\n"+(L.pas||"-")+"\nKegiatan yang terlewat: "+(L.terlewat||"-"));
+  o.push("\n3. ORGANISASI DAN JABATAN");S.pos.forEach(function(r){if(r.p||r.t)o.push("- "+(r.p||"?")+": "+(r.t||"?"))});
+  o.push("Penanggung jawab izin lokasi: "+(L.pjIzin||"-")+"\nPenanggung jawab narasumber: "+(L.pjNarasumber||"-"));
+  o.push("\n4. SUMBER DAYA PRODUKSI\nSDM: "+(L.sdm||"-")+"\nPeralatan: "+(L.alat||"-")+"\nUsulan anggaran (sisa Rp2.500.000):");
+  S.bud.forEach(function(r){if(r.n||r.c)o.push("- "+(r.n||"?")+": "+rp(parseFloat(r.c)||0))});
+  o.push("Total: "+rp(budTotal())+" | Sisa: "+rp(SISA-budTotal())+"\nAlasan prioritas: "+(L.alasan||"-"));
+  o.push("Jadwal:\nH-14 s.d. H-10: "+(L.w1||"-")+"\nH-9 s.d. H-5: "+(L.w2||"-")+"\nH-4 s.d. H-1: "+(L.w3||"-")+"\nHari H: "+(L.w4||"-"));
+  o.push("\n5. SOLUSI EMPAT MASALAH");for(var i=0;i<4;i++)o.push("Masalah "+(i+1)+": "+(L["sol"+i]||"-"));
+  o.push("\n6. REFLEKSI ("+(L.refNama||"-")+")\nPerasaan: "+(L.mood||"-")+"\nYang dipelajari: "+(L.ref1||"-")+"\nYang masih sulit: "+(L.ref2||"-")+"\nPeran dan perbaikan: "+(L.ref3||"-"));
+  o.push("\nTANGGAPAN UNTUK "+(L.tKelompok||"-")+"\nKelebihan: "+(L.tLebih||"-")+"\nSaran: "+(L.tSaran||"-"));return o.join("\n")}
+$("#mkexport").addEventListener("click",function(){$("#exporttext").value=buildExport();$("#exportbox").hidden=false;$("#copyexport").hidden=false;$("#exporttext").select()});
+$("#copyexport").addEventListener("click",function(){var ta=$("#exporttext"),b=this;ta.select();function ok(){b.textContent="Teks tersalin";setTimeout(function(){b.textContent="Salin teks"},1600)}function manual(){b.textContent="Pilih teks lalu salin manual"}
+  try{if(navigator.clipboard){navigator.clipboard.writeText(ta.value).then(ok,function(){try{document.execCommand("copy");ok()}catch(e){manual()}})}else{document.execCommand("copy");ok()}}catch(e){manual()}});
+$("#clearlkpd").addEventListener("click",function(){if(!confirm("Kosongkan semua isian lembar kerja di perangkat ini?"))return;S.lkpd={};L=S.lkpd;S.pos=[{p:"Produser",t:""},{p:"",t:""},{p:"",t:""}];S.bud=[{n:"",c:""},{n:"",c:""}];$$("[data-k]").forEach(function(el){el.value=""});$$("[data-mood]").forEach(function(b){b.setAttribute("aria-pressed","false")});renderPos();renderBud();$("#exportbox").hidden=true;onLkpd()});
+
+/* ================= KUIS ================= */
+var QUIZ=[
+ {q:"Mengurus izin lokasi dan mengonfirmasi narasumber termasuk kegiatan pada tahap …",o:["Praproduksi","Produksi","Pascaproduksi","Penayangan"],a:0,e:"Izin lokasi dan narasumber harus beres sebelum hari syuting, jadi termasuk praproduksi."},
+ {q:"Siapa yang bertanggung jawab atas keseluruhan program, termasuk anggaran dan jadwal?",o:["Sutradara","Produser","Floor Director","Editor"],a:1,e:"Produser memegang tanggung jawab keseluruhan program. Sutradara fokus memimpin kru saat produksi."},
+ {q:"Kamera dan lampu dipinjam program lain pada hari syuting. Pencegahan yang paling tepat adalah …",o:["Membeli kamera baru","Menunda tayang perdana","Booking alat ke bagian teknik sejak praproduksi","Syuting memakai kamera ponsel"],a:2,e:"Peralatan harus dipetakan dan dipesan sejak praproduksi agar tidak bentrok dengan program lain."},
+ {q:"Anggaran disetujui Rp12.000.000 dan sudah terpakai Rp9.500.000. Berapa sisa dana untuk editing dan penayangan?",o:["Rp1.500.000","Rp2.000.000","Rp2.500.000","Rp3.500.000"],a:2,e:"Rp12.000.000 − Rp9.500.000 = Rp2.500.000, sekitar 21% dari anggaran."},
+ {q:"Naskah baru selesai sehari sebelum syuting. Sumber daya apa yang gagal dikelola?",o:["Waktu","Peralatan","SDM teknik","Lokasi"],a:0,e:"Masalahnya ada pada waktu. Jadwal kerja yang dihitung mundur dari tanggal tayang menetapkan tenggat naskah dan waktu latihan."}];
+var Q={i:0,score:0,ans:false};
+function qBest(){$("#q-best").textContent=S.best!=null?"Skor terbaikmu: "+S.best+"/5.":""}
+function qRender(){var box=$("#quizbox");
+  if(Q.i>=QUIZ.length){if(S.best==null||Q.score>S.best){S.best=Q.score;save()}qBest();
+    var msg=Q.score===5?"Sempurna. Kamu siap untuk pertemuan berikutnya: format acara dan target penonton.":Q.score>=4?"Bagus. Tinjau kembali penjelasan soal yang terlewat.":"Baca lagi materi tahapan, organisasi, dan sumber daya, lalu coba lagi.";
+    box.innerHTML='<div class="bignum">'+Q.score+'/5</div><p>'+msg+'</p><button class="btn" type="button" id="q-again">Ulangi kuis</button>';$("#q-again").addEventListener("click",function(){Q={i:0,score:0,ans:false};qRender()});return}
+  var it=QUIZ[Q.i];Q.ans=false;
+  box.innerHTML='<div class="qprog">'+QUIZ.map(function(_,k){return '<span class="'+(k<=Q.i?"on":"")+'"></span>'}).join("")+'</div><div class="small muted">Soal '+(Q.i+1)+" dari 5</div><h3 style='margin-top:6px'>"+it.q+'</h3><div class="opts">'+it.o.map(function(o,k){return '<button type="button" class="opt" data-o="'+k+'">'+String.fromCharCode(65+k)+". "+o+"</button>"}).join("")+'</div><div id="q-exp"></div>';
+  $$(".opt",box).forEach(function(b){b.addEventListener("click",function(){if(Q.ans)return;Q.ans=true;var k=+b.dataset.o,right=k===it.a;if(right)Q.score++;
+    $$(".opt",box)[it.a].classList.add("right");if(!right)b.classList.add("wrongpick");
+    $("#q-exp").innerHTML='<div class="feedback '+(right?"ok":"bad")+'"><strong>'+(right?"Tepat.":"Belum tepat.")+"</strong> "+it.e+'</div><div class="btnrow"><button class="btn" type="button" id="q-next">'+(Q.i===4?"Lihat skor":"Soal berikutnya")+"</button></div>";
+    $("#q-next").addEventListener("click",function(){Q.i++;qRender()});$("#q-next").focus()})})}
+qBest();qRender();
+
+/* ================= GURU: waktu ================= */
+var PHASES=[
+ {n:"Pendahuluan",m:10,s:["Salam, doa, literasi Al-Qur’an, cek kehadiran dan kesiapan","Apersepsi: tayangkan cuplikan di balik layar atau putar Studio 3D","Asesmen diagnostik: tiga pertanyaan singkat","Kaitkan dengan pengalaman menonton TV, YouTube, siaran langsung","Sampaikan tujuan, alur PBL, produk akhir, dan cara penilaian"]},
+ {n:"PBL 1: Orientasi pada masalah",m:10,s:["Tayangkan dan bacakan kasus “Ngobrol Makassar”","Murid menandai informasi penting dan menulis satu pertanyaan (LKPD bagian 1)","Jelaskan peran murid sebagai tim konsultan produksi"]},
+ {n:"PBL 2: Mengorganisasikan belajar",m:10,s:["Bentuk kelompok 4–5 orang","Bagikan tautan aplikasi ini","Kelompok membagi peran dan Tugas A, B, C"]},
+ {n:"PBL 3: Penyelidikan",m:25,s:["Murid menelusuri materi, Studio 3D, internet atau buku","Tugas A, B, C dikerjakan di Lembar Kerja","Murid mencoba simulasi Cocokkan Jabatan dan Tugas","Berkeliling: “Apa dampaknya jika posisi ini tidak ada?” dan catat observasi"]},
+ {n:"PBL 4: Menyajikan hasil",m:15,s:["Kelompok menyelesaikan solusi empat masalah (bagian 5)","Tiga kelompok presentasi, maksimal 3 menit","Kelompok lain mengisi lembar tanggapan"]},
+ {n:"PBL 5: Evaluasi dan refleksi",m:10,s:["Evaluasi: apakah empat masalah terpecahkan?","Luruskan miskonsepsi","Simpulkan keterkaitan tahapan, organisasi, dan sumber daya"]},
+ {n:"Penutup",m:10,s:["Refleksi individu (bagian 6) dan kuis 5 soal","Umpan balik dan info pertemuan berikutnya: format acara dan target penonton","Apresiasi kelompok terbaik dan doa penutup"]}];
+var T={i:0,left:600,run:false,iv:null};
+function fmt(s){var neg=s<0;s=Math.abs(s);return (neg?"+":"")+String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function tRender(){$("#phases").innerHTML=PHASES.map(function(p,i){return '<button type="button" class="phase '+(i===T.i?"cur":i<T.i?"past":"")+'" data-ph="'+i+'"><span>'+p.n+"</span><small>"+p.m+" menit</small></button>"}).join("")+'<p class="small muted" style="margin:6px 4px">Total 90 menit</p>';
+  $$("[data-ph]").forEach(function(b){b.addEventListener("click",function(){tGo(+b.dataset.ph)})});
+  var p=PHASES[T.i];$("#ph-name").textContent="Fase "+(T.i+1)+" dari "+PHASES.length+": "+p.n;
+  $("#ph-steps").innerHTML=p.s.map(function(s,k){var id="c"+T.i+"_"+k;return '<li><label><input type="checkbox" data-ck="'+id+'"'+(S.checks[id]?" checked":"")+"><span>"+s+"</span></label></li>"}).join("");
+  $$("[data-ck]").forEach(function(c){c.addEventListener("change",function(){S.checks[c.dataset.ck]=c.checked;save()})});tClock()}
+function tClock(){var c=$("#clock");c.textContent=fmt(T.left);c.classList.toggle("over",T.left<0);$("#t-start").textContent=T.run?"Jeda":"Mulai";$("#lamp").classList.toggle("live",T.run);$("#t-next").disabled=T.i>=PHASES.length-1;Studio.tally(T.run)}
+function tGo(i){T.i=i;T.left=PHASES[i].m*60;tRender()}
+$("#t-start").addEventListener("click",function(){T.run=!T.run;if(T.run)T.iv=setInterval(function(){T.left--;tClock()},1000);else clearInterval(T.iv);tClock()});
+$("#t-next").addEventListener("click",function(){if(T.i<PHASES.length-1)tGo(T.i+1)});
+$("#t-reset").addEventListener("click",function(){T.left=PHASES[T.i].m*60;tClock()});
+
+/* ================= GURU: rubrik ================= */
+var ASP=["Tahapan","Organisasi","Sumber daya","Solusi","Presentasi"];
+if(!S.rub.length)S.rub=[{n:"Kelompok 1",s:[0,0,0,0,0]},{n:"Kelompok 2",s:[0,0,0,0,0]}];
+function sel(v,attr){return "<select "+attr+'><option value="0">–</option>'+[4,3,2,1].map(function(x){return '<option value="'+x+'"'+(v===x?" selected":"")+">"+x+"</option>"}).join("")+"</select>"}
+function rubRender(){$("#rubtable").innerHTML="<thead><tr><th>Kelompok</th>"+ASP.map(function(a){return "<th>"+a+"</th>"}).join("")+"<th>Skor</th><th>Nilai</th><th>Tindak lanjut</th><th></th></tr></thead><tbody>"+S.rub.map(function(r,i){var full=r.s.every(Boolean),sum=r.s.reduce(function(a,b){return a+b},0),v=sum/20*100;
+    var st=!full?'<span class="pill">Belum lengkap</span>':v>=90?'<span class="pill ok">Tuntas, pengayaan</span>':v>=75?'<span class="pill ok">Tuntas</span>':'<span class="pill bad">Remedial</span>';
+    return '<tr><td><input type="text" aria-label="Nama kelompok" data-rn="'+i+'" value="'+esc(r.n)+'"></td>'+r.s.map(function(x,k){return "<td>"+sel(x,'aria-label="'+ASP[k]+'" data-rs="'+i+"_"+k+'"')+"</td>"}).join("")+"<td>"+(full?sum+"/20":"–")+"</td><td><strong>"+(full?Math.round(v):"–")+"</strong></td><td>"+st+'</td><td><button type="button" class="x" data-rdel="'+i+'" aria-label="Hapus kelompok">×</button></td></tr>'}).join("")+"</tbody>";
+  $$("[data-rn]").forEach(function(el){el.addEventListener("input",function(){S.rub[+el.dataset.rn].n=el.value;save()})});
+  $$("[data-rs]").forEach(function(el){el.addEventListener("change",function(){var p=el.dataset.rs.split("_");S.rub[+p[0]].s[+p[1]]=+el.value;save();rubRender()})});
+  $$("[data-rdel]").forEach(function(b){b.addEventListener("click",function(){S.rub.splice(+b.dataset.rdel,1);save();rubRender()})})}
+$("#addgroup").addEventListener("click",function(){S.rub.push({n:"Kelompok "+(S.rub.length+1),s:[0,0,0,0,0]});save();rubRender()});
+$("#showrub").addEventListener("click",function(){var d=$("#rubdesc");d.hidden=!d.hidden;this.textContent=d.hidden?"Lihat deskriptor rubrik":"Sembunyikan deskriptor"});
+rubRender();
+
+/* ================= GURU: observasi ================= */
+var OBS=["Kolaborasi","Komunikasi","Penalaran kritis","Kemandirian"];
+if(!S.obs.length)for(var o=0;o<5;o++)S.obs.push({n:"",s:[0,0,0,0],c:""});
+function obsRender(){$("#obstable").innerHTML="<thead><tr><th>No</th><th>Nama murid/kelompok</th>"+OBS.map(function(a){return "<th>"+a+"</th>"}).join("")+"<th>Rata-rata</th><th>Catatan</th><th></th></tr></thead><tbody>"+S.obs.map(function(r,i){var f=r.s.filter(Boolean),avg=f.length?(f.reduce(function(a,b){return a+b},0)/f.length).toFixed(1).replace(".",","):"–";
+    return "<tr><td>"+(i+1)+'</td><td><input type="text" aria-label="Nama" data-on="'+i+'" value="'+esc(r.n)+'"></td>'+r.s.map(function(v,k){return "<td>"+sel(v,'aria-label="'+OBS[k]+'" data-os="'+i+"_"+k+'"')+"</td>"}).join("")+"<td><strong>"+avg+'</strong></td><td><input type="text" aria-label="Catatan" data-oc="'+i+'" value="'+esc(r.c)+'"></td><td><button type="button" class="x" data-odel="'+i+'" aria-label="Hapus baris">×</button></td></tr>'}).join("")+"</tbody>";
+  $$("[data-on]").forEach(function(el){el.addEventListener("input",function(){S.obs[+el.dataset.on].n=el.value;save()})});
+  $$("[data-oc]").forEach(function(el){el.addEventListener("input",function(){S.obs[+el.dataset.oc].c=el.value;save()})});
+  $$("[data-os]").forEach(function(el){el.addEventListener("change",function(){var p=el.dataset.os.split("_");S.obs[+p[0]].s[+p[1]]=+el.value;save();obsRender()})});
+  $$("[data-odel]").forEach(function(b){b.addEventListener("click",function(){S.obs.splice(+b.dataset.odel,1);save();obsRender()})})}
+$("#addobs").addEventListener("click",function(){S.obs.push({n:"",s:[0,0,0,0],c:""});save();obsRender()});
+obsRender();
+
+/* ================= STUDIO 3D ================= */
+var HS=[
+ {id:"kamera",cat:"Peralatan",name:"Kamera studio (pedestal)",fungsi:"Merekam gambar dari tiga sudut. Kamera 1 mengambil close-up host, kamera 2 gambar lebar, kamera 3 close-up narasumber. Lampu merah (tally) di atas kamera menyala saat kamera itu sedang tayang.",oleh:"Kameramen",tahap:"Produksi; dipesan sejak praproduksi",kasus:"Masalah 2: kamera harus dibooking ke bagian teknik agar tidak dipinjam program lain.",v:[[-.9,2.1,4.6],[-3.1,1.4,2.4]]},
+ {id:"prompter",cat:"Peralatan",name:"Teleprompter",fungsi:"Kaca di depan lensa kamera 2 yang memantulkan naskah, sehingga host bisa membaca sambil tetap menatap kamera.",oleh:"Operator prompter (Asisten Produser)",tahap:"Produksi",kasus:"Masalah 4: naskah harus final lebih awal agar bisa dimuat ke teleprompter dan dilatih.",v:[[1.4,1.7,.4],[0,1.45,3.1]]},
+ {id:"lampu",cat:"Peralatan",name:"Lampu studio (three-point lighting)",fungsi:"Key light (cahaya utama), fill light (pengisi bayangan), dan back light (pemisah dari latar) dipasang di rangka atas atau lighting grid.",oleh:"Penata Cahaya",tahap:"Produksi; desain cahaya di praproduksi",kasus:"Masalah 2: lampu juga harus dibooking bersama kamera.",v:[[-6,4.5,5],[-1.5,4.6,-0.5]]},
+ {id:"set",cat:"Area",name:"Set dan backdrop",fungsi:"Identitas visual program. Motif belah ketupat dan gambar kapal pinisi mengangkat budaya Bugis-Makassar.",oleh:"Penata Artistik",tahap:"Dirancang di praproduksi, dipasang di produksi",kasus:"Bagian dari anggaran produksi (set dan properti).",v:[[0,2.6,3.2],[0,2,-4]]},
+ {id:"talent",cat:"Kru",name:"Host dan narasumber",fungsi:"Host memandu obrolan; dua narasumber membahas kuliner, budaya, dan anak muda Makassar. Semuanya memakai mikrofon clip-on.",oleh:"Host; narasumber diundang Asisten Produser",tahap:"Dihubungi di praproduksi, tampil di produksi",kasus:"Masalah 1: harus jelas siapa yang menghubungi narasumber.",v:[[0.6,1.8,1.2],[0,1.1,-2.4]]},
+ {id:"fd",cat:"Kru",name:"Floor Director",fungsi:"Menerima perintah sutradara lewat headset intercom, lalu memberi aba-aba (cue) dan hitungan mundur kepada host.",oleh:"Floor Director",tahap:"Produksi",kasus:"Tanpa floor director, sutradara di ruang kontrol tidak bisa mengarahkan host.",v:[[3.4,2,3],[1.7,1.2,0.4]]},
+ {id:"kameramen",cat:"Kru",name:"Kameramen",fungsi:"Mengatur komposisi (framing), fokus, dan gerak kamera sesuai perintah sutradara melalui headset.",oleh:"Kameramen 1, 2, 3",tahap:"Produksi",kasus:"Butuh kamera yang tersedia pada hari syuting.",v:[[-5.2,2.2,6],[-3,1.2,3]]},
+ {id:"monitor",cat:"Peralatan",name:"Floor monitor",fungsi:"Menampilkan gambar program yang sedang tayang agar host dan kru di lantai bisa melihat hasilnya.",oleh:"Bagian teknik",tahap:"Produksi",kasus:"Bagian dari daftar peralatan yang harus disiapkan.",v:[[-1.6,1.8,2.4],[-4,1.2,0.2]]},
+ {id:"switcher",cat:"Area",name:"Ruang kontrol: video switcher",fungsi:"Switcher atau Technical Director memilih kamera mana yang tayang. Monitor PVW (hijau) menyiapkan gambar, monitor PGM (merah) menampilkan gambar yang tayang.",oleh:"Switcher (TD)",tahap:"Produksi",kasus:"Sutradara memberi perintah, misalnya “Kamera 2 siap… take!”.",v:[[6.1,2.7,-4.6],[7.9,1.2,-1.4]]},
+ {id:"audio",cat:"Peralatan",name:"Audio mixer",fungsi:"Mengatur level suara mikrofon host, narasumber, dan musik agar seimbang dan jernih.",oleh:"Penata Suara",tahap:"Produksi dan pascaproduksi",kasus:"Mikrofon dan mixer harus dicek saat check sound.",v:[[6.2,2.5,2.6],[7.8,1,-.2]]},
+ {id:"sutradara",cat:"Kru",name:"Sutradara dan produser",fungsi:"Sutradara memimpin seluruh kru dari ruang kontrol. Produser memantau isi dan durasi sesuai rundown.",oleh:"Sutradara, Produser",tahap:"Semua tahap",kasus:"Produser yang seharusnya membagi tugas sejak rapat produksi (masalah 1).",v:[[4.4,2.6,-3.4],[6.6,1.4,-.6]]}
+];
+var Studio=(function(){
+  var api={place:function(){},tally:function(){}};
+  var stageEl=$("#stage"),pinsEl=$("#pins"),nogl=$("#nogl");
+  if(!window.THREE||!THREE.OrbitControls){nogl.style.display="grid";buildList();api.place=function(h){var t=h==="studio"?$("#tour3d"):h==="beranda"?$("#hero3d"):null;if(t)t.appendChild(stageEl)};return api}
+  var renderer;
+  try{renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"})}catch(e){nogl.style.display="grid";buildList();api.place=function(h){var t=h==="studio"?$("#tour3d"):h==="beranda"?$("#hero3d"):null;if(t)t.appendChild(stageEl)};return api}
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.outputEncoding=THREE.sRGBEncoding;
+  stageEl.insertBefore(renderer.domElement,pinsEl);
+  var scene=new THREE.Scene();scene.background=new THREE.Color(0x070a14);scene.fog=new THREE.Fog(0x070a14,20,42);
+  var cam=new THREE.PerspectiveCamera(42,1.6,0.1,120);cam.position.set(9.5,5.2,10.5);
+  var controls=new THREE.OrbitControls(cam,renderer.domElement);controls.target.set(0.5,1.4,-1.2);controls.enableDamping=true;controls.dampingFactor=.08;controls.maxPolarAngle=Math.PI*.49;controls.minDistance=1.6;controls.maxDistance=24;controls.autoRotateSpeed=.55;
+
+  function std(c,r,m,o){var p={color:c,roughness:r==null?.6:r,metalness:m||0};if(o)for(var k in o)p[k]=o[k];return new THREE.MeshStandardMaterial(p)}
+  function add(par,geo,mat,x,y,z,rx,ry,rz,noShadow){var m=new THREE.Mesh(geo,mat);m.position.set(x||0,y||0,z||0);m.rotation.set(rx||0,ry||0,rz||0);if(!noShadow){m.castShadow=true;m.receiveShadow=true}par.add(m);return m}
+  function tex(w,h,draw){var c=document.createElement("canvas");c.width=w;c.height=h;draw(c.getContext("2d"),w,h);var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t}
+  function tag(g,id){g.userData.hs=id;return g}
+  var anchors={};
+  function anchor(par,id,x,y,z){var o=new THREE.Object3D();o.position.set(x,y,z);par.add(o);anchors[id]=o}
+
+  /* lights */
+  scene.add(new THREE.HemisphereLight(0x9fb0ff,0x1a1a26,.45));
+  var amb=new THREE.AmbientLight(0x404a70,.25);scene.add(amb);
+
+  /* floor */
+  var floorTex=tex(1024,1024,function(x,w,h){x.fillStyle="#1b1e29";x.fillRect(0,0,w,h);for(var i=0;i<1600;i++){x.fillStyle="rgba(255,255,255,"+(Math.random()*.025)+")";x.fillRect(Math.random()*w,Math.random()*h,2,2)}x.strokeStyle="rgba(255,255,255,.035)";x.lineWidth=2;for(var j=0;j<=w;j+=128){x.beginPath();x.moveTo(j,0);x.lineTo(j,h);x.stroke();x.beginPath();x.moveTo(0,j);x.lineTo(w,j);x.stroke()}});
+  floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping;floorTex.repeat.set(6,6);
+  var floor=add(scene,new THREE.PlaneGeometry(60,60),std(0xffffff,.32,.15,{map:floorTex}),0,0,0,-Math.PI/2);floor.castShadow=false;
+
+  /* backdrop */
+  var bdTex=tex(2048,880,function(x,w,h){var g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,"#0b2140");g.addColorStop(.5,"#16467a");g.addColorStop(1,"#0b2140");x.fillStyle=g;x.fillRect(0,0,w,h);
+    x.strokeStyle="rgba(255,196,90,.22)";x.lineWidth=3;var s=70;for(var yy=-s;yy<h+s;yy+=s)for(var xx=-s;xx<w+s;xx+=s){x.beginPath();x.moveTo(xx,yy-s/2);x.lineTo(xx+s/2,yy);x.lineTo(xx,yy+s/2);x.lineTo(xx-s/2,yy);x.closePath();x.stroke()}
+    var v=x.createLinearGradient(0,0,0,h);v.addColorStop(0,"rgba(0,0,0,.55)");v.addColorStop(.25,"rgba(0,0,0,0)");v.addColorStop(.8,"rgba(0,0,0,0)");v.addColorStop(1,"rgba(0,0,0,.6)");x.fillStyle=v;x.fillRect(0,0,w,h);
+    for(var k=0;k<6;k++){var cx=k<3?120+k*170:w-120-(k-3)*170;var lg=x.createLinearGradient(cx-16,0,cx+16,0);lg.addColorStop(0,"rgba(255,190,80,0)");lg.addColorStop(.5,"rgba(255,200,110,.75)");lg.addColorStop(1,"rgba(255,190,80,0)");x.fillStyle=lg;x.fillRect(cx-16,60,32,h-120)}
+    x.fillStyle="rgba(255,255,255,.85)";x.font="800 46px 'Plus Jakarta Sans',Arial,sans-serif";x.textAlign="center";x.fillText("TV PESISIR MAKASSAR",w/2,105)});
+  bdTex.wrapS=THREE.RepeatWrapping;bdTex.repeat.x=-1;
+  var bd=add(scene,new THREE.CylinderGeometry(9,9,6.4,64,1,true,Math.PI-1,2),new THREE.MeshStandardMaterial({map:bdTex,side:THREE.BackSide,roughness:.8,emissive:0x0a1a33,emissiveIntensity:.4}),0,3.2,3.6);bd.castShadow=false;tag(bd,"set");
+  /* LED screen with pinisi */
+  var ledTex=tex(1280,720,function(x,w,h){var g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#2a1a5e");g.addColorStop(.45,"#e0574a");g.addColorStop(.62,"#ffb057");g.addColorStop(.63,"#1f4d7a");g.addColorStop(1,"#0d2440");x.fillStyle=g;x.fillRect(0,0,w,h);
+    x.fillStyle="rgba(255,230,160,.9)";x.beginPath();x.arc(w*.72,h*.56,70,Math.PI,0);x.fill();
+    for(var i=0;i<14;i++){x.fillStyle="rgba(255,210,140,"+(.25-i*.015)+")";x.fillRect(w*.6+Math.random()*180,h*.64+i*14,120-i*6,3)}
+    x.fillStyle="#120d22";var bx=w*.18,by=h*.6;x.beginPath();x.moveTo(bx,by);x.lineTo(bx+430,by);x.quadraticCurveTo(bx+470,by-10,bx+500,by-46);x.lineTo(bx-40,by-46);x.quadraticCurveTo(bx-20,by-8,bx,by);x.fill();
+    x.fillRect(bx+120,by-330,8,290);x.fillRect(bx+300,by-300,8,260);
+    x.beginPath();x.moveTo(bx+132,by-325);x.lineTo(bx+132,by-70);x.lineTo(bx+270,by-70);x.closePath();x.fill();
+    x.beginPath();x.moveTo(bx+312,by-295);x.lineTo(bx+312,by-70);x.lineTo(bx+430,by-70);x.closePath();x.fill();
+    x.beginPath();x.moveTo(bx+116,by-300);x.lineTo(bx+116,by-80);x.lineTo(bx+20,by-80);x.closePath();x.fill();
+    x.beginPath();x.moveTo(bx+500,by-46);x.lineTo(bx+640,by-160);x.lineTo(bx+508,by-60);x.fill();
+    x.fillStyle="#fff";x.textAlign="left";x.font="800 92px 'Plus Jakarta Sans',Arial,sans-serif";x.fillText("Ngobrol",70,130);x.fillStyle="#FFD27A";x.fillText("Makassar",70,225);
+    x.fillStyle="rgba(255,255,255,.85)";x.font="600 32px 'Plus Jakarta Sans',Arial,sans-serif";x.fillText("Kuliner, budaya, dan anak muda",74,280)});
+  var ledFrame=add(scene,new THREE.BoxGeometry(4.5,2.6,.16),std(0x111318,.4,.6),0,2.75,-5.15);tag(ledFrame,"set");
+  var led=add(scene,new THREE.PlaneGeometry(4.3,2.42),new THREE.MeshBasicMaterial({map:ledTex,toneMapped:false}),0,2.75,-5.06,0,0,0,true);tag(led,"set");
+
+  /* platform */
+  var plat=new THREE.Group();scene.add(plat);tag(plat,"set");
+  var woodTex=tex(512,512,function(x,w,h){x.fillStyle="#6d4a31";x.fillRect(0,0,w,h);for(var i=0;i<16;i++){x.fillStyle=i%2?"rgba(0,0,0,.1)":"rgba(255,220,180,.05)";x.fillRect(0,i*32,w,32);x.fillStyle="rgba(0,0,0,.25)";x.fillRect(0,i*32,w,1.5)}for(var k=0;k<400;k++){x.fillStyle="rgba(40,20,10,.12)";x.fillRect(Math.random()*w,Math.random()*h,40+Math.random()*80,1)}});
+  woodTex.wrapS=woodTex.wrapT=THREE.RepeatWrapping;woodTex.repeat.set(3,2);
+  add(plat,new THREE.CylinderGeometry(3.9,4.1,.28,64,1,false,Math.PI/2,Math.PI),std(0xffffff,.45,.05,{map:woodTex}),0,.14,-2.2);
+  add(plat,new THREE.CylinderGeometry(4.12,4.12,.04,64,1,true,Math.PI/2,Math.PI),new THREE.MeshBasicMaterial({color:0xffb347,side:THREE.DoubleSide,toneMapped:false}),0,.06,-2.2,0,0,0,true);
+  var PT=.28;
+  /* furniture */
+  function chair(par,x,z,ry,col,w){var g=new THREE.Group();g.position.set(x,PT,z);g.rotation.y=ry;par.add(g);w=w||.72;var fab=std(col,.85),leg=std(0x1d1f26,.3,.8);
+    add(g,new THREE.BoxGeometry(w,.16,.66),fab,0,.44,0);add(g,new THREE.BoxGeometry(w,.62,.14),fab,0,.78,-.27,-.12);
+    add(g,new THREE.BoxGeometry(.1,.26,.6),fab,-w/2,.6,0);add(g,new THREE.BoxGeometry(.1,.26,.6),fab,w/2,.6,0);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(p){add(g,new THREE.CylinderGeometry(.025,.02,.36,8),leg,p[0]*(w/2-.06),.18,p[1]*.26)});return g}
+  chair(plat,-1.7,-2.3,.55,0xb53a2e);
+  chair(plat,1.05,-2.75,-.35,0x2e5d8c,1.5);
+  add(plat,new THREE.CylinderGeometry(.5,.5,.05,40),std(0x2a2522,.25,.2),-.15,PT+.45,-2.1);
+  add(plat,new THREE.CylinderGeometry(.08,.14,.42,16),std(0x1d1f26,.3,.8),-.15,PT+.21,-2.1);
+  add(plat,new THREE.CylinderGeometry(.045,.04,.1,16),std(0xf4efe6,.3),-.05,PT+.52,-2.0);
+  add(plat,new THREE.CylinderGeometry(.045,.04,.1,16),std(0xf4efe6,.3),-.3,PT+.52,-2.2);
+  var pot=add(plat,new THREE.CylinderGeometry(.22,.17,.45,24),std(0xc9b79c,.7),2.9,PT+.22,-3.4);
+  for(var lf=0;lf<9;lf++){var a=lf/9*Math.PI*2;add(plat,new THREE.SphereGeometry(.22,12,10),std(0x2f7a3a,.8),2.9+Math.cos(a)*.15,PT+.75+(lf%3)*.18,-3.4+Math.sin(a)*.15)}
+  add(plat,new THREE.CylinderGeometry(.22,.17,.45,24),std(0xc9b79c,.7),-3,PT+.22,-3.3);
+  for(lf=0;lf<9;lf++){a=lf/9*Math.PI*2;add(plat,new THREE.SphereGeometry(.2,12,10),std(0x2f7a3a,.8),-3+Math.cos(a)*.15,PT+.72+(lf%3)*.18,-3.3+Math.sin(a)*.15)}
+
+  /* people */
+  function person(par,o){var g=new THREE.Group();g.position.set(o.x,o.y||0,o.z);g.rotation.y=o.ry||0;par.add(g);
+    var skin=std(o.skin||0xc68a5e,.65),shirt=std(o.shirt,.85),pants=std(o.pants||0x252a3a,.85),hair=std(o.hair||0x17110d,.9),shoe=std(0x111111,.5);
+    if(o.seated){add(g,new THREE.BoxGeometry(.17,.15,.48),pants,-.11,.52,.18);add(g,new THREE.BoxGeometry(.17,.15,.48),pants,.11,.52,.18);
+      add(g,new THREE.CylinderGeometry(.07,.065,.46,12),pants,-.11,.27,.4);add(g,new THREE.CylinderGeometry(.07,.065,.46,12),pants,.11,.27,.4);
+      add(g,new THREE.BoxGeometry(.12,.08,.24),shoe,-.11,.04,.47);add(g,new THREE.BoxGeometry(.12,.08,.24),shoe,.11,.04,.47);
+      var by=.58}else{add(g,new THREE.CylinderGeometry(.085,.075,.86,12),pants,-.11,.45,0);add(g,new THREE.CylinderGeometry(.085,.075,.86,12),pants,.11,.45,0);
+      add(g,new THREE.BoxGeometry(.12,.08,.26),shoe,-.11,.04,.05);add(g,new THREE.BoxGeometry(.12,.08,.26),shoe,.11,.04,.05);by=.88}
+    add(g,new THREE.CylinderGeometry(.2,.17,.62,16),shirt,0,by+.3,0);
+    add(g,new THREE.SphereGeometry(.21,16,12),shirt,0,by+.58,0).scale.set(1.15,.45,.8);
+    add(g,new THREE.CylinderGeometry(.06,.07,.1,10),skin,0,by+.7,0);
+    var head=add(g,new THREE.SphereGeometry(.15,20,16),skin,0,by+.86,.01);head.scale.set(.92,1.08,1);
+    var hr=add(g,new THREE.SphereGeometry(.158,20,16,0,Math.PI*2,0,Math.PI*.55),hair,0,by+.88,-.01);
+    if(o.hijab){add(g,new THREE.SphereGeometry(.175,20,16,0,Math.PI*2,0,Math.PI*.62),std(o.hijab,.85),0,by+.86,-.015);add(g,new THREE.ConeGeometry(.24,.3,20,1,true),std(o.hijab,.85),0,by+.62,0);hr.visible=false}
+    var arm=o.seated?[-.55,.15]:[.05,.1];
+    [-1,1].forEach(function(s){var u=add(g,new THREE.CylinderGeometry(.055,.05,.34,10),shirt,s*.26,by+.42,o.seated?.08:0,arm[0],0,s*arm[1]);
+      add(g,new THREE.CylinderGeometry(.048,.045,.3,10),o.seated?shirt:skin,s*.28,o.seated?by+.22:by+.14,o.seated?.3:0,o.seated?-1.35:0,0,0);
+      add(g,new THREE.SphereGeometry(.05,10,8),skin,s*.28,o.seated?by+.2:by-.02,o.seated?.46:0)});
+    if(o.headset){add(g,new THREE.TorusGeometry(.16,.015,8,24,Math.PI),std(0x111111,.4,.5),0,by+.88,0,0,Math.PI/2,0);[-1,1].forEach(function(s){add(g,new THREE.CylinderGeometry(.05,.05,.04,14),std(0x111111,.4),s*.155,by+.86,0,0,0,Math.PI/2)});add(g,new THREE.CylinderGeometry(.008,.008,.16,6),std(0x111111,.4),-.12,by+.8,.08,1.2,0,0)}
+    if(o.mic)add(g,new THREE.BoxGeometry(.03,.04,.02),std(0x111111,.4),.07,by+.48,.17);
+    if(o.id)tag(g,o.id);return g}
+  person(plat,{x:-1.7,y:PT,z:-2.3,ry:.55,seated:1,shirt:0xece4d6,pants:0x2b3550,mic:1,id:"talent"});
+  person(plat,{x:.7,y:PT,z:-2.75,ry:-.35,seated:1,shirt:0x7a2f3e,skin:0xb97c52,hijab:0x3d6c7a,mic:1,id:"talent"});
+  person(plat,{x:1.4,y:PT,z:-2.75,ry:-.35,seated:1,shirt:0x2f5f4a,skin:0xa8714a,mic:1,id:"talent"});
+  anchor(scene,"talent",-.2,1.9,-2.4);anchor(scene,"set",2.6,3.6,-4.6);
+
+  /* cameras */
+  var tallyMats=[];
+  function studioCam(x,z,tx,tz,n,prompter){var g=new THREE.Group();g.position.set(x,0,z);scene.add(g);g.lookAt(tx,0,tz);tag(g,prompter?"prompter":"kamera");
+    var dark=std(0x22252d,.45,.5),black=std(0x0c0d10,.35,.4),metal=std(0x8b919c,.25,.9),grey=std(0x3a3f4b,.5,.4);
+    add(g,new THREE.CylinderGeometry(.45,.5,.14,32),dark,0,.1,0);
+    for(var i=0;i<3;i++){var a=i/3*Math.PI*2;add(g,new THREE.CylinderGeometry(.06,.06,.05,16),black,Math.cos(a)*.48,.04,Math.sin(a)*.48,0,0,Math.PI/2)}
+    add(g,new THREE.CylinderGeometry(.09,.11,.95,20),metal,0,.65,0);
+    add(g,new THREE.TorusGeometry(.32,.025,10,40),metal,0,.82,0,Math.PI/2,0,0);
+    add(g,new THREE.CylinderGeometry(.12,.12,.12,20),dark,0,1.17,0);
+    var body=add(g,new THREE.BoxGeometry(.34,.36,.66),grey,0,1.42,-.02);
+    add(g,new THREE.BoxGeometry(.36,.06,.5),dark,0,1.62,-.02);
+    add(g,new THREE.CylinderGeometry(.12,.13,.5,24),black,0,1.42,.52,Math.PI/2,0,0);
+    add(g,new THREE.CylinderGeometry(.105,.105,.02,24),new THREE.MeshStandardMaterial({color:0x2a3d6e,roughness:.05,metalness:.95}),0,1.42,.775,Math.PI/2,0,0);
+    add(g,new THREE.BoxGeometry(.26,.18,.2),black,0,1.75,-.1);
+    add(g,new THREE.PlaneGeometry(.2,.13),new THREE.MeshBasicMaterial({color:0x5d7bd6,toneMapped:false}),0,1.75,-.201,0,Math.PI,0,true);
+    var tm=new THREE.MeshStandardMaterial({color:0x550000,emissive:0xff1a2e,emissiveIntensity:n===2?1.6:.05});tallyMats.push({m:tm,n:n});
+    add(g,new THREE.SphereGeometry(.04,12,10),tm,0,1.88,0);
+    [-1,1].forEach(function(s){add(g,new THREE.CylinderGeometry(.018,.018,.75,10),metal,s*.2,1.3,-.62,1.1,0,s*.25);add(g,new THREE.CylinderGeometry(.03,.03,.12,10),black,s*.27,1.12,-.95,1.1,0,s*.25)});
+    var lbl=tex(128,64,function(x,w,h){x.fillStyle="#f4f4f4";x.fillRect(0,0,w,h);x.fillStyle="#111";x.font="800 46px Arial";x.textAlign="center";x.fillText(String(n),w/2,48)});
+    add(g,new THREE.PlaneGeometry(.18,.09),new THREE.MeshBasicMaterial({map:lbl}),.171,1.45,0,0,Math.PI/2,0,true);
+    add(g,new THREE.PlaneGeometry(.18,.09),new THREE.MeshBasicMaterial({map:lbl}),-.171,1.45,0,0,-Math.PI/2,0,true);
+    if(prompter){add(g,new THREE.BoxGeometry(.62,.5,.04),black,0,1.45,1.16);add(g,new THREE.BoxGeometry(.62,.04,.45),black,0,1.7,.95);add(g,new THREE.BoxGeometry(.04,.5,.45),black,-.31,1.45,.95);add(g,new THREE.BoxGeometry(.04,.5,.45),black,.31,1.45,.95);
+      var ptx=tex(512,384,function(x,w,h){x.fillStyle="#05060a";x.fillRect(0,0,w,h);x.fillStyle="#e8e8e8";x.font="700 34px Arial";x.textAlign="center";["Selamat malam, Makassar!","Malam ini kita ngobrol","tentang coto, konro,","dan pallubasa…"].forEach(function(s,i){x.fillText(s,w/2,90+i*60)})});
+      add(g,new THREE.PlaneGeometry(.56,.42),new THREE.MeshBasicMaterial({map:ptx,transparent:true,opacity:.85,toneMapped:false}),0,1.45,.95,-Math.PI/4,0,0,true);
+      add(g,new THREE.BoxGeometry(.56,.04,.36),dark,0,1.2,.95)}
+    /* spike tape */
+    add(scene,new THREE.BoxGeometry(.4,.005,.06),new THREE.MeshBasicMaterial({color:0xf2c200}),x,.003,z+.55,0,0,0,true);
+    return g}
+  var c1=studioCam(-3.1,2.4,-1.4,-2.2,1),c2=studioCam(0,3,-.2,-2.4,2,true),c3=studioCam(3.1,2.4,1.1,-2.6,3);
+  anchor(c1,"kamera",0,2.1,0);anchor(c2,"prompter",0,1.95,1);
+  /* camera operators */
+  function behind(c,dist){var d=new THREE.Vector3(0,0,1).applyQuaternion(c.quaternion);return {x:c.position.x-d.x*dist,z:c.position.z-d.z*dist,ry:Math.atan2(d.x,d.z)}}
+  [c1,c2,c3].forEach(function(c,i){var b=behind(c,1.15);person(scene,{x:b.x,z:b.z,ry:b.ry,shirt:[0x1e1f24,0x2c3e50,0x1e1f24][i],headset:1,id:"kameramen"})});
+  var b1=behind(c1,1.15);anchor(scene,"kameramen",b1.x,2.05,b1.z);
+
+  /* floor director */
+  person(scene,{x:1.75,z:.5,ry:Math.PI+.35,shirt:0x111317,pants:0x30343f,headset:1,id:"fd"});anchor(scene,"fd",1.75,2.05,.5);
+
+  /* floor monitor */
+  var mon=new THREE.Group();mon.position.set(-4.1,0,.2);scene.add(mon);mon.lookAt(0,0,-2.4);tag(mon,"monitor");
+  add(mon,new THREE.CylinderGeometry(.3,.35,.05,24),std(0x1d1f26,.3,.8),0,.03,0);add(mon,new THREE.CylinderGeometry(.03,.03,1.1,10),std(0x8b919c,.25,.9),0,.6,0);
+  add(mon,new THREE.BoxGeometry(1.1,.66,.07),std(0x111214,.35,.5),0,1.35,0);
+  var pgmTex=tex(640,360,function(x,w,h){x.drawImage(ledTex.image,0,0,w,h);x.fillStyle="rgba(10,14,40,.92)";x.fillRect(30,h-90,380,60);x.fillStyle="#DE2E40";x.fillRect(30,h-90,8,60);x.fillStyle="#fff";x.font="700 26px Arial";x.fillText("Daeng Rahmat",54,h-55);x.font="18px Arial";x.fillStyle="#cfd4ef";x.fillText("Pegiat kuliner Makassar",54,h-35)});
+  add(mon,new THREE.PlaneGeometry(1.02,.58),new THREE.MeshBasicMaterial({map:pgmTex,toneMapped:false}),0,1.35,.037,0,0,0,true);
+  anchor(mon,"monitor",0,1.85,0);
+
+  /* lighting grid and fixtures */
+  var pipe=std(0x5b616d,.35,.85);
+  [[0,5.8,1.2,12,0],[0,5.8,-4.2,12,0]].forEach(function(p){add(scene,new THREE.CylinderGeometry(.04,.04,p[3],10),pipe,p[0],p[1],p[2],0,0,Math.PI/2)});
+  [[-5,5.8,-1.5],[5,5.8,-1.5]].forEach(function(p){add(scene,new THREE.CylinderGeometry(.04,.04,5.6,10),pipe,p[0],p[1],p[2],Math.PI/2,0,0)});
+  var beams=[];
+  function fixture(x,y,z,tx,ty,tz,color,inten,shadow,label){var g=new THREE.Group();g.position.set(x,y,z);scene.add(g);g.lookAt(tx,ty,tz);tag(g,"lampu");
+    var bodyM=std(0x1b1d22,.45,.6);add(g,new THREE.CylinderGeometry(.17,.21,.46,20),bodyM,0,0,0,Math.PI/2,0,0);
+    add(g,new THREE.CylinderGeometry(.16,.16,.02,20),new THREE.MeshStandardMaterial({color:0xffffff,emissive:color,emissiveIntensity:2.2}),0,0,.24,Math.PI/2,0,0,true);
+    [[0,.2,-.4,0],[0,-.2,.4,0],[.2,0,0,.4],[-.2,0,0,-.4]].forEach(function(b){var m=add(g,new THREE.BoxGeometry(b[3]?.02:.32,b[3]?.32:.02,.2),bodyM,b[0],b[1],.36);m.rotation.x=b[2];m.rotation.y=b[3]});
+    add(scene,new THREE.CylinderGeometry(.02,.02,Math.max(.05,5.8-y),8),pipe,x,(5.8+y)/2,z);
+    var sp=new THREE.SpotLight(color,inten,30,.42,.55,1);sp.position.set(x,y,z);sp.target.position.set(tx,ty,tz);scene.add(sp);scene.add(sp.target);
+    if(shadow){sp.castShadow=true;sp.shadow.mapSize.set(1024,1024);sp.shadow.bias=-.0004;sp.shadow.camera.near=1;sp.shadow.camera.far=20}
+    var from=new THREE.Vector3(x,y,z),to=new THREE.Vector3(tx,ty,tz),dir=from.clone().sub(to),len=dir.length()*.92;dir.normalize();
+    var cone=new THREE.Mesh(new THREE.ConeGeometry(Math.tan(.36)*len,len,40,1,true),new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:.055,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+    cone.position.copy(from).add(to.clone().sub(from).multiplyScalar(.5*len/from.distanceTo(to)));cone.position.copy(from.clone().lerp(to,.5*.92));
+    cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);cone.position.copy(from.clone().sub(dir.clone().multiplyScalar(len/2)));scene.add(cone);beams.push(cone);
+    if(label)anchor(g,"lampu",0,.4,0);return g}
+  fixture(-3.2,5.2,1.2,-.6,1.2,-2.4,0xfff0d8,1.7,true,1);
+  fixture(3.2,5.2,1.2,.8,1.2,-2.5,0xffe8cf,.9,false);
+  fixture(-.6,5.3,-4.2,0,1.3,-2.3,0xdfe8ff,1.1,true);
+  fixture(-4.6,5.3,-1.2,-2.5,1.8,-5,0x4a7dff,1.1,false);
+  fixture(4.6,5.3,-1.2,2.5,1.8,-5,0xff9f3d,1.1,false);
+  var fillSp=new THREE.SpotLight(0xbfd0ff,.5,40,.7,.8,1);fillSp.position.set(0,6,8);fillSp.target.position.set(0,0,0);scene.add(fillSp);scene.add(fillSp.target);
+
+  /* control room */
+  var cr=new THREE.Group();cr.position.set(7.6,0,-1);cr.rotation.y=-Math.PI/2;scene.add(cr);
+  add(cr,new THREE.BoxGeometry(4.6,.12,3.4),std(0x23262f,.6),0,.06,.3);
+  var desk=new THREE.Group();cr.add(desk);
+  add(desk,new THREE.BoxGeometry(3.6,.08,.9),std(0x2a2d36,.4,.3),0,.82,-.25);add(desk,new THREE.BoxGeometry(3.6,.74,.08),std(0x1c1e24,.6),0,.42,-.66);
+  var swTex=tex(512,256,function(x,w,h){x.fillStyle="#15171c";x.fillRect(0,0,w,h);var cols=["#3a3f4b","#3a3f4b","#3a3f4b","#3a3f4b","#3a3f4b","#3a3f4b"];for(var r=0;r<3;r++)for(var c=0;c<10;c++){var col=r===0&&c===1?"#ff2e40":r===1&&c===2?"#2ee36b":"#3c4250";x.fillStyle=col;x.fillRect(20+c*48,24+r*58,36,36)}x.fillStyle="#9aa0ad";x.fillRect(w-28,30,10,190)});
+  var sw=add(desk,new THREE.BoxGeometry(1.3,.08,.5),new THREE.MeshStandardMaterial({color:0xffffff,map:swTex,roughness:.5}),-.75,.9,-.22,.12,0,0);tag(sw,"switcher");
+  var auTex=tex(512,256,function(x,w,h){x.fillStyle="#17191e";x.fillRect(0,0,w,h);for(var c=0;c<12;c++){x.fillStyle="#2b2f38";x.fillRect(20+c*40,30,8,190);x.fillStyle="#e0e3ea";x.fillRect(12+c*40,80+((c*37)%90),24,16);for(var k=0;k<3;k++){x.fillStyle=["#ffb347","#6aa0ff","#d0d0d0"][k];x.beginPath();x.arc(24+c*40,12+k*0,6,0,7);x.fill()}}});
+  var au=add(desk,new THREE.BoxGeometry(1.2,.08,.5),new THREE.MeshStandardMaterial({color:0xffffff,map:auTex,roughness:.5}),.85,.9,-.22,.12,0,0);tag(au,"audio");
+  /* monitor wall */
+  var wall=new THREE.Group();wall.position.set(0,0,-1.1);cr.add(wall);tag(wall,"switcher");
+  add(wall,new THREE.BoxGeometry(3.9,1.9,.12),std(0x101114,.5,.4),0,1.95,0);
+  function screenTex(label,border,mode){return tex(480,280,function(x,w,h){if(mode==="bars"){var cs=["#c9c9c9","#d4c200","#00b5c0","#00a33a","#b0189e","#c81e1e","#1e2fc8"];cs.forEach(function(c,i){x.fillStyle=c;x.fillRect(i*w/7,0,w/7+1,h)})}else{x.drawImage(ledTex.image,mode*120,40,640,360,0,0,w,h)}
+    x.lineWidth=14;x.strokeStyle=border;x.strokeRect(0,0,w,h);x.fillStyle="rgba(0,0,0,.7)";x.fillRect(0,h-42,150,42);x.fillStyle="#fff";x.font="700 26px Arial";x.fillText(label,12,h-12)})}
+  [["CAM 1","#555",0,-1.25,2.35],["CAM 2","#555",1,0,2.35],["CAM 3","#555",2,1.25,2.35],["PVW","#2ee36b",2,-.65,1.5],["PGM","#ff2e40",1,.65,1.5]].forEach(function(s){add(wall,new THREE.PlaneGeometry(s[0].length>3?1.18:1.1,s[0].length>3?.68:.64),new THREE.MeshBasicMaterial({map:screenTex(s[0],s[1],s[2]),toneMapped:false}),s[3],s[4],.065,0,0,0,true)});
+  var sign=tex(512,96,function(x,w,h){x.fillStyle="#DE2E40";x.fillRect(0,0,w,h);x.fillStyle="#fff";x.font="800 50px Arial";x.textAlign="center";x.fillText("ON AIR",w/2,66)});
+  var signM=new THREE.MeshStandardMaterial({map:sign,emissive:0xff2233,emissiveMap:sign,emissiveIntensity:.25});add(wall,new THREE.BoxGeometry(1,.2,.06),signM,0,3.1,0);
+  function deskChair(x,z){var g=new THREE.Group();g.position.set(x,.12,z);cr.add(g);var bl=std(0x16171b,.6);add(g,new THREE.CylinderGeometry(.3,.3,.05,20),bl,0,.05,0);add(g,new THREE.CylinderGeometry(.03,.03,.38,8),std(0x8b919c,.3,.8),0,.25,0);add(g,new THREE.BoxGeometry(.5,.1,.5),bl,0,.44,0);add(g,new THREE.BoxGeometry(.5,.55,.08),bl,0,.75,.24)}
+  deskChair(-.75,.45);deskChair(.85,.45);
+  person(cr,{x:-.75,y:.12,z:.45,ry:Math.PI,seated:1,shirt:0x3b4a6b,headset:1,id:"switcher"});
+  person(cr,{x:.85,y:.12,z:.45,ry:Math.PI,seated:1,shirt:0x6b3b4a,headset:1,id:"audio",hijab:0x2e2e3a});
+  person(cr,{x:0,y:.12,z:1.35,ry:Math.PI,shirt:0x1b2433,pants:0x2a2a2a,headset:1,id:"sutradara"});
+  person(cr,{x:1.4,y:.12,z:1.5,ry:Math.PI+.4,shirt:0x8a6b3a,id:"sutradara"});
+  anchor(cr,"switcher",-.75,1.25,-.2);anchor(cr,"audio",.85,1.25,-.2);anchor(cr,"sutradara",.4,2.3,1.4);
+  var crLight=new THREE.PointLight(0x9fb4ff,.6,7,2);crLight.position.set(7,3,-1);scene.add(crLight);
+  /* control room glass frame */
+  var frameM=std(0x2a2d36,.4,.6);
+  add(cr,new THREE.BoxGeometry(4.6,.08,.08),frameM,0,2.8,2);add(cr,new THREE.BoxGeometry(.08,2.8,.08),frameM,-2.3,1.4,2);add(cr,new THREE.BoxGeometry(.08,2.8,.08),frameM,2.3,1.4,2);
+  var glass=add(cr,new THREE.PlaneGeometry(4.5,1.7),new THREE.MeshStandardMaterial({color:0x9fc0ff,transparent:true,opacity:.08,roughness:.05,metalness:.5,side:THREE.DoubleSide,depthWrite:false}),0,1.95,2,0,0,0,true);glass.raycast=function(){};
+  add(cr,new THREE.BoxGeometry(4.6,1,.1),std(0x1f2128,.6),0,.55,2);
+
+  /* pins */
+  var pinEls={};
+  HS.forEach(function(h,i){var b=document.createElement("button");b.type="button";b.className="pin";b.textContent=i+1;b.setAttribute("aria-label",h.name);b.addEventListener("click",function(e){e.stopPropagation();focus(h.id)});pinsEl.appendChild(b);pinEls[h.id]=b});
+  var pinsOn=true,mode="hero",current=null;
+  /* picking */
+  var ray=new THREE.Raycaster(),down=null;
+  renderer.domElement.addEventListener("pointerdown",function(e){down=[e.clientX,e.clientY];if(mode==="hero"){controls.autoRotate=false;clearTimeout(api._rt);api._rt=setTimeout(function(){if(mode==="hero")controls.autoRotate=true},6000)}stopAnim()});
+  renderer.domElement.addEventListener("pointerup",function(e){if(!down)return;var dx=e.clientX-down[0],dy=e.clientY-down[1];down=null;if(dx*dx+dy*dy>25)return;
+    var r=renderer.domElement.getBoundingClientRect();ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},cam);
+    var hit=ray.intersectObjects(scene.children,true);for(var i=0;i<hit.length;i++){var o=hit[i].object;while(o&&!o.userData.hs)o=o.parent;if(o){if(mode==="hero"){location.hash="#studio";setTimeout(function(id){return function(){focus(id)}}(o.userData.hs),60)}else focus(o.userData.hs);return}}});
+  /* camera animation */
+  var anim=null;
+  function stopAnim(){anim=null}
+  function fly(p,t){anim={t0:performance.now(),d:1100,fp:cam.position.clone(),ft:controls.target.clone(),tp:new THREE.Vector3(p[0],p[1],p[2]),tt:new THREE.Vector3(t[0],t[1],t[2])}}
+  var HOME=[[9.5,5.2,10.5],[.5,1.4,-1.2]];
+  function focus(id){var h=HS.filter(function(x){return x.id===id})[0];if(!h)return;current=id;controls.autoRotate=false;fly(h.v[0],h.v[1]);showDetail(h)}
+  api.focus=focus;
+  $("#viewall").addEventListener("click",function(){current=null;fly(HOME[0],HOME[1]);showDetail(null)});
+  $("#togglepins").addEventListener("click",function(){pinsOn=!pinsOn;this.textContent=pinsOn?"Sembunyikan titik":"Tampilkan titik";pinsEl.classList.toggle("off",!pinsOn)});
+  /* tally */
+  api.tally=function(on){tallyMats.forEach(function(t){t.m.emissiveIntensity=t.n===2&&(on||mode==="tour")?1.8:on&&t.n===2?1.8:.05});signM.emissiveIntensity=on?1.4:.25};
+  /* resize & loop */
+  var size=[0,0];
+  function resize(){var p=stageEl.parentElement;if(!p)return;var w=p.clientWidth,h=p.clientHeight;if(!w||!h)return;if(w!==size[0]||h!==size[1]){size=[w,h];renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}}
+  var v=new THREE.Vector3();
+  function loop(now){requestAnimationFrame(loop);if(!stageEl.parentElement||!stageEl.offsetParent)return;resize();
+    if(anim){var k=Math.min(1,(now-anim.t0)/anim.d),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;cam.position.lerpVectors(anim.fp,anim.tp,e);controls.target.lerpVectors(anim.ft,anim.tt,e);if(k>=1)anim=null}
+    controls.update();
+    var t=now*.001;beams.forEach(function(b,i){b.material.opacity=.045+Math.sin(t*1.3+i)*.01});
+    renderer.render(scene,cam);
+    if(mode==="tour"&&pinsOn){HS.forEach(function(h){var a=anchors[h.id],el=pinEls[h.id];if(!a){el.hidden=true;return}a.getWorldPosition(v);v.project(cam);if(v.z>1||v.x<-1.05||v.x>1.05||v.y<-1.05||v.y>1.05){el.hidden=true;return}el.hidden=false;el.style.transform="translate(-50%,-50%) translate("+((v.x+1)/2*size[0])+"px,"+((1-v.y)/2*size[1])+"px)";el.classList.toggle("on",current===h.id)})}}
+  requestAnimationFrame(loop);
+  api.place=function(h){var target=h==="studio"?$("#tour3d"):h==="beranda"?$("#hero3d"):null;if(!target)return;
+    if(stageEl.parentElement!==target)target.appendChild(stageEl);
+    if(h==="studio"){mode="tour";pinsEl.classList.toggle("off",!pinsOn);controls.autoRotate=false;controls.enableZoom=true}
+    else{mode="hero";pinsEl.classList.add("off");current=null;controls.autoRotate=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;controls.enableZoom=false;cam.position.set(HOME[0][0],HOME[0][1],HOME[0][2]);controls.target.set(HOME[1][0],HOME[1][1],HOME[1][2])}
+    size=[0,0];api.tally(T.run)};
+  buildList();
+  return api;
+})();
+function buildList(){
+  $("#hslist").innerHTML=HS.map(function(h,i){return '<button type="button" class="hsbtn" data-hs="'+h.id+'"><span class="n">'+(i+1)+"</span><span>"+h.name+'<br><span class="small muted" style="font-weight:500">'+h.cat+"</span></span></button>"}).join("");
+  $$("[data-hs]").forEach(function(b){b.addEventListener("click",function(){var sb=$("#tour3d").getBoundingClientRect();if(sb.top<0||sb.bottom>window.innerHeight)$("#tour3d").scrollIntoView({behavior:"smooth",block:"center"});if(Studio.focus)Studio.focus(b.dataset.hs);else showDetail(HS.filter(function(x){return x.id===b.dataset.hs})[0])})})}
+function showDetail(h){
+  $$("[data-hs]").forEach(function(b){b.setAttribute("aria-pressed",h&&b.dataset.hs===h.id?"true":"false")});
+  if(!h){$("#hsdetail").innerHTML='<h3>Pilih bagian studio</h3><p class="muted small">Ada 11 titik: peralatan, kru, dan area. Mulailah dari kamera atau ruang kontrol.</p>';return}
+  $("#hsdetail").innerHTML='<span class="pill">'+h.cat+"</span><h3 style='margin-top:8px'>"+h.name+"</h3><p>"+h.fungsi+"</p><dl><dt>Dioperasikan</dt><dd>"+h.oleh+"</dd><dt>Tahap</dt><dd>"+h.tahap+"</dd><dt>Kasus</dt><dd>"+h.kasus+"</dd></dl>"}
+
+tRender();
+route();
+})();
+</script>
+</body>
+</html>
